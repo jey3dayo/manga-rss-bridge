@@ -48,6 +48,15 @@ docker build -t manga-rss-bridge .
 docker run --rm -p 8080:8080 manga-rss-bridge
 ```
 
+## GitHub Container Registry
+
+Images are published to GHCR from `main` and `v*.*.*` tags.
+
+```bash
+docker pull ghcr.io/jey3dayo/manga-rss-bridge:latest
+docker run --rm -p 8080:8080 ghcr.io/jey3dayo/manga-rss-bridge:latest
+```
+
 ## Policy
 
 This is an unofficial bridge. It does not bypass authentication, paid content,

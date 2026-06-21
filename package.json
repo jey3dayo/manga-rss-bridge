@@ -1,0 +1,45 @@
+{
+  "name": "manga-rss-bridge",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Self-hosted RSS bridge for manga chapter feeds.",
+  "scripts": {
+    "dev": "pnpm exec tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "pnpm exec tsc -p tsconfig.json",
+    "format": "pnpm exec biome format --write .",
+    "format:check": "pnpm exec biome format .",
+    "lint": "pnpm exec biome lint .",
+    "lint:fix": "pnpm exec biome lint --write .",
+    "check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "test": "pnpm exec vitest run",
+    "test:watch": "pnpm exec vitest"
+  },
+  "keywords": [
+    "rss",
+    "manga",
+    "comic",
+    "bridge",
+    "self-hosted"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@hono/node-server": "^1.19.6",
+    "@praha/byethrow": "^0.12.0",
+    "hono": "^4.9.12",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.0",
+    "@types/node": "^25.9.3",
+    "tsx": "^4.20.6",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "engines": {
+    "node": "24",
+    "pnpm": "11.8.0"
+  },
+  "packageManager": "pnpm@11.8.0"
+}

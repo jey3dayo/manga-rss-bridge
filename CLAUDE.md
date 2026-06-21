@@ -1,14 +1,16 @@
 # Manga RSS Bridge Agent Guide
 
 Use [README.md](README.md) as the source of truth for product overview, setup, provider list, command details, and verification scope.
+This file is the short repository-local workflow guide for agents.
 
 ## First Actions
 
 - Read `AGENTS.md` first when your runtime routes through it, then this file, then linked source documents.
 - Check `git status --short` before editing. Preserve unrelated user or generated changes.
 - Prefer existing files and local patterns. Keep changes scoped to the requested task.
-- Default local verification before finishing: `pnpm check`, `pnpm test`, and `pnpm build`.
-- Run `pnpm format:check` and `pnpm lint` when touching source, tests, or repository metadata.
+- Default type verification before finishing: `mise run check`.
+- Use `mise run ci` when broad confidence, PR handoff, release, or build-output validation matters.
+- If mise is unavailable, fall back to the matching `pnpm` scripts.
 
 ## Source Of Truth
 
@@ -17,7 +19,7 @@ Use [README.md](README.md) as the source of truth for product overview, setup, p
 | Agent runtime entry | [AGENTS.md](AGENTS.md) | Thin router for runtimes that read `AGENTS.md` before repository-local guidance |
 | Agent workflow and source routing | [CLAUDE.md](CLAUDE.md) | Repository-local workflow, quality gates, and source ownership |
 | Product scope, setup, usage, supported providers | [README.md](README.md) | User-facing overview, examples, commands, and policy |
-| Tool versions and scripts | [package.json](package.json) | Package manager, Node engine, scripts, and dependency contract |
+| Tool versions and scripts | [mise.toml](mise.toml) and [package.json](package.json) | Toolchain versions, mise task aliases, package manager, Node engine, scripts, and dependency contract |
 | Runtime constants | `src/constants/*.ts` | Shared literals such as headers, provider IDs, and stable defaults |
 | Test fixtures | `src/fixtures/*.ts` | Reusable sample inputs for tests and parser coverage |
 | Runtime schemas | `src/schemas/*.ts` | Zod schemas for external provider responses and runtime boundaries |
@@ -28,10 +30,12 @@ Use [README.md](README.md) as the source of truth for product overview, setup, p
 
 ## Quality Gates
 
-- `pnpm check` is the TypeScript type gate.
-- `pnpm test` is the Vitest gate.
-- `pnpm build` verifies emitted server output.
-- `pnpm format:check` and `pnpm lint` are the Biome gates.
+- `mise run check` is the TypeScript type gate.
+- `mise run ci` is the full aggregate gate and runs `format:check`, `lint`, `check`, `test`, and `build`.
+- `mise run format` applies Biome formatting.
+- `mise run format:check` and `mise run lint` are the Biome read-only gates.
+- `mise run format`, `mise run format:check`, `mise run lint`, `mise run lint:fix`, `mise run check`, `mise run test`, `mise run build`, and `mise run dev` map to the existing package scripts.
+- If mise is unavailable, use the equivalent `pnpm` script directly.
 - Before publishing or Docker handoff, also build the Docker image or document why it was not run.
 
 ## High-Signal Rules
@@ -55,7 +59,7 @@ When adding a provider:
 3. Register it in `src/providers/index.ts`.
 4. Add README examples and policy notes if user-facing behavior changes.
 5. Add focused Vitest coverage for RSS rendering or provider parsing helpers. Prefer fixtures over live network tests.
-6. Run `pnpm format:check`, `pnpm lint`, `pnpm check`, `pnpm test`, and `pnpm build`.
+6. Run `mise run ci`, or the equivalent `pnpm` scripts if mise is unavailable.
 
 ## Task Tracking
 

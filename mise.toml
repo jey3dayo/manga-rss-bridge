@@ -1,0 +1,56 @@
+[env]
+_.path = ["./node_modules/.bin"]
+
+[tools]
+node = "24"
+"npm:pnpm" = "11.8.0"
+
+[tasks.format]
+description = "Format files with Biome"
+run = "pnpm run format"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome format --write ."'
+
+[tasks."format:check"]
+description = "Check formatting with Biome"
+run = "pnpm run format:check"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome format ."'
+
+[tasks.lint]
+description = "Lint files with Biome"
+run = "pnpm run lint"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome lint ."'
+
+[tasks."lint:fix"]
+description = "Apply safe Biome lint fixes"
+run = "pnpm run lint:fix"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome lint --write ."'
+
+[tasks.check]
+description = "Run TypeScript type checking"
+run = "pnpm run check"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/typescript/bin/tsc -p tsconfig.json --noEmit"'
+
+[tasks.test]
+description = "Run Vitest once"
+run = "pnpm run test"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/vitest/vitest.mjs run src"'
+
+[tasks.build]
+description = "Build the service"
+run = "pnpm run build"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/typescript/bin/tsc -p tsconfig.json"'
+
+[tasks.dev]
+description = "Run the development server"
+run = "pnpm run dev"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) --watch src/server.ts"'
+
+[tasks.ci]
+description = "Full aggregate gate"
+run = [
+  { task = "format:check" },
+  { task = "lint" },
+  { task = "check" },
+  { task = "test" },
+  { task = "build" },
+]

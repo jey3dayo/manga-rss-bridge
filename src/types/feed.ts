@@ -1,4 +1,4 @@
-import type { Result } from '../lib/result.js';
+import type { Result } from '../lib/result.ts';
 
 export type FeedItem = {
   id: string;

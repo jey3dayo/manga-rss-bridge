@@ -1,6 +1,6 @@
-import type { Provider } from '../types/feed.js';
-import { ganganOnlineProvider } from './gangan-online.js';
-import { kadocomiProvider } from './kadocomi.js';
+import type { Provider } from '../types/feed.ts';
+import { ganganOnlineProvider } from './gangan-online.ts';
+import { kadocomiProvider } from './kadocomi.ts';
 
 const providers = new Map<string, Provider>([
   [ganganOnlineProvider.id, ganganOnlineProvider],

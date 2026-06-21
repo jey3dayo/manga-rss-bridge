@@ -1,4 +1,4 @@
-import type { FeedItem, MangaFeed } from '../types/feed.js';
+import type { FeedItem, MangaFeed } from '../types/feed.ts';
 
 const escapeXml = (value: string): string =>
   value
@@ -10,18 +10,32 @@ const escapeXml = (value: string): string =>
 
 const formatDate = (value: string | undefined): string | undefined => {
   if (!value) return undefined;
-  const date = new Date(value);
-  if (!Number.isNaN(date.valueOf())) return date.toUTCString();
+  const formatDateParts = (year: string, month: string, day: string): string | undefined => {
+    const yearNumber = Number(year);
+    const monthNumber = Number(month);
+    const dayNumber = Number(day);
+    const parsed = new Date(Date.UTC(yearNumber, monthNumber - 1, dayNumber));
+    if (
+      parsed.getUTCFullYear() !== yearNumber ||
+      parsed.getUTCMonth() !== monthNumber - 1 ||
+      parsed.getUTCDate() !== dayNumber
+    ) {
+      return undefined;
+    }
+    return parsed.toUTCString();
+  };
   const slash = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(value);
-  if (slash) {
+  if (slash?.[1] && slash[2] && slash[3]) {
     const [, year, month, day] = slash;
-    return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))).toUTCString();
+    return formatDateParts(year, month, day);
   }
   const japanese = /^(\d{4})年(\d{1,2})月(\d{1,2})日$/.exec(value);
-  if (japanese) {
+  if (japanese?.[1] && japanese[2] && japanese[3]) {
     const [, year, month, day] = japanese;
-    return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))).toUTCString();
+    return formatDateParts(year, month, day);
   }
+  const date = new Date(value);
+  if (!Number.isNaN(date.valueOf())) return date.toUTCString();
   return undefined;
 };
 
@@ -31,9 +45,10 @@ const renderItem = (
   identifier: string,
   item: FeedItem,
 ): string => {
-  const description = item.thumbnail
-    ? `<img src="${escapeXml(item.thumbnail)}" alt=""/><br/>${escapeXml(feed.description)}`
-    : escapeXml(feed.description);
+  const descriptionText = item.thumbnail
+    ? `<img src="${item.thumbnail}" alt=""/><br/>${feed.description}`
+    : feed.description;
+  const description = escapeXml(descriptionText);
   const pubDate = formatDate(item.date);
   return [
     '    <item>',

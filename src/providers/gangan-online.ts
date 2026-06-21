@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { fetchJson, fetchText } from '../lib/http.js';
-import { tryCatch } from '../lib/result.js';
-import { ganganTitleSchema, type GanganTitle } from '../schemas/gangan-online.js';
-import type { MangaFeed, Provider } from '../types/feed.js';
+import { fetchJson, fetchText } from '../lib/http.ts';
+import { tryCatch } from '../lib/result.ts';
+import { ganganTitleSchema, type GanganTitle } from '../schemas/gangan-online.ts';
+import type { MangaFeed, Provider } from '../types/feed.ts';
 
 const nextDataSchema = z
   .object({
@@ -56,8 +56,9 @@ export const ganganOnlineProvider: Provider = {
       const link = `https://www.ganganonline.com/title/${encodeURIComponent(titleId)}`;
       const items = (title.chapters ?? [])
         .filter((chapter) => chapter.id !== undefined)
-        .map((chapter) => {
-          const chapterId = String(chapter.id);
+        .flatMap((chapter) => {
+          const chapterId = String(chapter.id).trim();
+          if (!chapterId) return [];
           return {
             id: chapterId,
             title: chapter.mainText ?? `chapter ${chapterId}`,

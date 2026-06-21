@@ -1,8 +1,8 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
-import { Result } from './lib/result.js';
-import { renderRss } from './lib/rss.js';
-import { getProvider, listProviders } from './providers/index.js';
+import { Result } from './lib/result.ts';
+import { renderRss } from './lib/rss.ts';
+import { getProvider, listProviders } from './providers/index.ts';
 
 const app = new Hono();
 
@@ -19,7 +19,7 @@ app.get('/:provider/:feedPath', async (c) => {
   const providerId = c.req.param('provider');
   const feedPath = c.req.param('feedPath');
   if (!providerId || !feedPath.endsWith('.xml')) return c.text('not found\n', 404);
-  const identifier = feedPath.slice(0, -'.xml'.length);
+  const identifier = feedPath.slice(0, -'.xml'.length).trim();
   if (!identifier) return c.text('not found\n', 404);
 
   const provider = getProvider(providerId);

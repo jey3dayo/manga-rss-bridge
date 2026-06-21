@@ -1,4 +1,4 @@
-import type { MangaFeed } from '../types/feed.js';
+import type { MangaFeed } from '../types/feed.ts';
 
 export const escapedRssFeedFixture: MangaFeed = {
   title: 'A & B',

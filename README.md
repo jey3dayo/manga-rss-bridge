@@ -10,12 +10,14 @@ self-hosted use.
 
 - Gangan ONLINE: `/gangan-online/<title-id>.xml`
 - カドコミ / ComicWalker: `/kadocomi/<work-code>.xml`
+- コミックDAYS: `/comic-days/<series-id>.xml`
 
 Examples:
 
 ```text
 http://localhost:8080/gangan-online/2061.xml
 http://localhost:8080/kadocomi/KC_000733_S.xml
+http://localhost:8080/comic-days/10834108156754578626.xml
 ```
 
 ## Development

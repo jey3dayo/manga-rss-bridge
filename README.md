@@ -11,6 +11,13 @@ self-hosted use.
 - Gangan ONLINE: `/gangan-online/<title-id>.xml`
 - カドコミ / ComicWalker: `/kadocomi/<work-code>.xml`
 - コミックDAYS: `/comic-days/<series-id>.xml`
+- ヤンマガWeb: `/yanmaga/<comic-slug>.xml`
+- マンガワン: `/manga-one/<chapter-id>.xml`
+- がうがうモンスター＋: `/gaugau/<work-id>.xml`
+- ファイアCROSS: `/firecross/<series-id>.xml`
+- ジャンプルーキー！: `/jump-rookie/<series-id>.xml`
+- ハヤコミ: `/hayacomic/<series-id>.xml`
+- マンガボックス: `/mangabox/<reader-id>.xml`
 
 Examples:
 
@@ -18,6 +25,13 @@ Examples:
 http://localhost:8080/gangan-online/2061.xml
 http://localhost:8080/kadocomi/KC_000733_S.xml
 http://localhost:8080/comic-days/10834108156754578626.xml
+http://localhost:8080/yanmaga/%E3%81%AD%E3%81%9A%E3%81%BF%E3%81%AE%E5%88%9D%E6%81%8B.xml
+http://localhost:8080/manga-one/157056.xml
+http://localhost:8080/gaugau/5f500f137765618260000000.xml
+http://localhost:8080/firecross/331.xml
+http://localhost:8080/jump-rookie/zGZPbQ9GPgM.xml
+http://localhost:8080/hayacomic/a947a3d0ec0a1.xml
+http://localhost:8080/mangabox/251785.xml
 ```
 
 ## Development

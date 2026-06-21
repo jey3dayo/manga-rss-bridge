@@ -46,3 +46,17 @@ export const fetchText = async (url: string, init?: RequestInit): Promise<string
   if (!response.ok) throw new Error(`GET ${url} failed: ${response.status}`);
   return response.text();
 };
+
+export const fetchBytes = async (url: string, init?: RequestInit): Promise<Uint8Array> => {
+  const response = await fetch(url, {
+    ...init,
+    headers: mergeHeaders(
+      {
+        'User-Agent': USER_AGENT,
+      },
+      init?.headers,
+    ),
+  });
+  if (!response.ok) throw new Error(`GET ${url} failed: ${response.status}`);
+  return new Uint8Array(await response.arrayBuffer());
+};

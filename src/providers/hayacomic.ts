@@ -13,5 +13,6 @@ export const hayacomicProvider = createHtmlListProvider({
   datePattern:
     /<div[^>]+class=["'][^"']*series-eplist-item-meta-date[^"']*["'][^>]*>([\s\S]*?)<\/div>/i,
   thumbnailPattern: /<img[^>]+src=["']([^"']+)["'][^>]*>/i,
-  feedTitle: (html, identifier) => titleBeforeSeparator(html, PROVIDERS.hayacomic, identifier),
+  feedTitle: (html, identifier) =>
+    titleBeforeSeparator(html, PROVIDERS.hayacomic.siteName, identifier),
 });

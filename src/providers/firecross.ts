@@ -25,6 +25,7 @@ export const firecrossProvider = createHtmlListProvider({
     /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>|<div[^>]+class=["'][^"']*title[^"']*["'][^>]*>([\s\S]*?)<\/div>/i,
   datePattern: /(\d{4}[./年-]\d{1,2}[./月-]\d{1,2}日?)/,
   thumbnailPattern: /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i,
-  feedTitle: (html, identifier) => titleBeforeSeparator(html, PROVIDERS.firecross, identifier),
+  feedTitle: (html, identifier) =>
+    titleBeforeSeparator(html, PROVIDERS.firecross.siteName, identifier),
   init: { headers: browserHeaders },
 });

@@ -19,7 +19,7 @@ export const kadocomiProvider: Provider = {
     return tryCatch(async (): Promise<MangaFeed> => {
       const apiUrl = `${PROVIDERS.kadocomi.baseUrl}/api/contents/details/work?workCode=${encodeURIComponent(workCode)}`;
       const data = await fetchJson(apiUrl, kadocomiWorkResponseSchema);
-      const title = data.work?.title ?? fallbackFeedTitle(PROVIDERS.kadocomi, workCode);
+      const title = data.work?.title ?? fallbackFeedTitle(PROVIDERS.kadocomi.siteName, workCode);
       const description = data.work?.catchphrase ?? data.work?.description ?? '';
       const items = (data.firstEpisodes?.result ?? [])
         .filter((episode) => episode.isActive !== false)

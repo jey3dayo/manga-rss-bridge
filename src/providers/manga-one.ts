@@ -183,7 +183,7 @@ export const mangaOneProvider: Provider = {
       return {
         title:
           metadata.title?.replace(/\s+第.+$/, '') ??
-          fallbackFeedTitle(PROVIDERS.mangaOne, identifier),
+          fallbackFeedTitle(PROVIDERS.mangaOne.siteName, identifier),
         link: itemUrl,
         description: metadata.description ?? '',
         items:

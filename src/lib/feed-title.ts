@@ -11,8 +11,14 @@ export const normalizeSiteWrappedTitle = (
   provider: ProviderMetadata,
   identifier: string,
 ): string => {
-  const siteWrappedTitle = new RegExp(`^${escapeRegExp(provider.siteName)}（(.+)）$`).exec(title);
-  return siteWrappedTitle?.[1]?.trim() || title || fallbackFeedTitle(provider, identifier);
+  const trimmedTitle = title.trim();
+  const siteWrappedTitle = new RegExp(`^${escapeRegExp(provider.siteName)}（(.*)）$`).exec(
+    trimmedTitle,
+  );
+  if (siteWrappedTitle) {
+    return siteWrappedTitle[1]?.trim() || fallbackFeedTitle(provider, identifier);
+  }
+  return trimmedTitle || fallbackFeedTitle(provider, identifier);
 };
 
 export const titleBeforeSeparator = (
@@ -21,9 +27,8 @@ export const titleBeforeSeparator = (
   identifier: string,
 ): string => {
   const fallback = fallbackFeedTitle(provider, identifier);
-  return (
-    (extractMetaContent(html, 'og:title') ?? extractTitle(html) ?? fallback)
-      .split(/[｜|]/)[0]
-      ?.trim() ?? fallback
-  );
+  const title = (extractMetaContent(html, 'og:title') ?? extractTitle(html) ?? fallback)
+    .split(/[｜|]/)[0]
+    ?.trim();
+  return title || fallback;
 };

@@ -33,8 +33,27 @@ describe('feed title helpers', () => {
     expect(normalizeSiteWrappedTitle('', provider, 'work')).toBe('Site work');
   });
 
+  it('falls back when title only contains whitespace', () => {
+    expect(normalizeSiteWrappedTitle('   ', provider, 'work')).toBe('Site work');
+  });
+
+  it('falls back when a site-wrapped title has empty content', () => {
+    expect(normalizeSiteWrappedTitle('コミックDAYS（）', comicDaysProvider, 'series')).toBe(
+      'コミックDAYS series',
+    );
+  });
+
   it('takes a title before common title separators', () => {
     const html = '<meta property="og:title" content="Work｜Site" />';
     expect(titleBeforeSeparator(html, provider, 'work')).toBe('Work');
+  });
+
+  it('falls back when the title before a separator is empty', () => {
+    expect(
+      titleBeforeSeparator('<meta property="og:title" content="｜Site" />', provider, 'work'),
+    ).toBe('Site work');
+    expect(
+      titleBeforeSeparator('<meta property="og:title" content="  | Site" />', provider, 'work'),
+    ).toBe('Site work');
   });
 });

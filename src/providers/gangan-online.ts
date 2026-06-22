@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { PROVIDERS } from '../constants/providers.ts';
+import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchJson, fetchText } from '../lib/http.ts';
 import { tryCatch } from '../lib/result.ts';
 import { ganganTitleSchema, type GanganTitle } from '../schemas/gangan-online.ts';
@@ -36,24 +38,25 @@ const embeddedTitleSchema = z.object({
 });
 
 const fetchTitle = async (titleId: string): Promise<GanganTitle> => {
-  const pageUrl = `https://www.ganganonline.com/title/${encodeURIComponent(titleId)}`;
+  const pageUrl = `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}`;
   const nextData = extractNextData(await fetchText(pageUrl));
   if (nextData.buildId) {
-    const dataUrl = `https://www.ganganonline.com/_next/data/${nextData.buildId}/title/${encodeURIComponent(titleId)}.json`;
+    const dataUrl = `${PROVIDERS.ganganOnline.baseUrl}/_next/data/${nextData.buildId}/title/${encodeURIComponent(titleId)}.json`;
     return (await fetchJson(dataUrl, nextTitleDataSchema)).pageProps.data.default;
   }
   return embeddedTitleSchema.parse(nextData).props.pageProps.data.default;
 };
 
 export const ganganOnlineProvider: Provider = {
-  id: 'gangan-online',
-  siteName: 'Gangan ONLINE',
+  id: PROVIDERS.ganganOnline.id,
+  siteName: PROVIDERS.ganganOnline.siteName,
   fetchFeed(titleId: string) {
     return tryCatch(async (): Promise<MangaFeed> => {
       const title = await fetchTitle(titleId);
-      const titleName = title.titleName ?? `Gangan ONLINE ${titleId}`;
+      const titleName =
+        title.titleName ?? fallbackFeedTitle(PROVIDERS.ganganOnline.siteName, titleId);
       const description = title.description ?? '';
-      const link = `https://www.ganganonline.com/title/${encodeURIComponent(titleId)}`;
+      const link = `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}`;
       const items = (title.chapters ?? [])
         .filter((chapter) => chapter.id !== undefined)
         .flatMap((chapter) => {
@@ -62,7 +65,7 @@ export const ganganOnlineProvider: Provider = {
           return {
             id: chapterId,
             title: chapter.mainText ?? `chapter ${chapterId}`,
-            url: `https://www.ganganonline.com/title/${encodeURIComponent(titleId)}/chapter/${encodeURIComponent(chapterId)}`,
+            url: `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}/chapter/${encodeURIComponent(chapterId)}`,
           };
         });
       return {

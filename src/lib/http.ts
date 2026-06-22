@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import { USER_AGENT } from '../constants/http.ts';
+import { HTTP_HEADERS, MIME_TYPES, USER_AGENT } from '../constants/http.ts';
 
 const mergeHeaders = (
   defaults: RequestInit['headers'],
@@ -23,8 +23,8 @@ export const fetchJson = async <Schema extends z.ZodType>(
     ...init,
     headers: mergeHeaders(
       {
-        Accept: 'application/json',
-        'User-Agent': USER_AGENT,
+        [HTTP_HEADERS.accept]: MIME_TYPES.json,
+        [HTTP_HEADERS.userAgent]: USER_AGENT,
       },
       init?.headers,
     ),
@@ -38,7 +38,7 @@ export const fetchText = async (url: string, init?: RequestInit): Promise<string
     ...init,
     headers: mergeHeaders(
       {
-        'User-Agent': USER_AGENT,
+        [HTTP_HEADERS.userAgent]: USER_AGENT,
       },
       init?.headers,
     ),
@@ -52,7 +52,7 @@ export const fetchBytes = async (url: string, init?: RequestInit): Promise<Uint8
     ...init,
     headers: mergeHeaders(
       {
-        'User-Agent': USER_AGENT,
+        [HTTP_HEADERS.userAgent]: USER_AGENT,
       },
       init?.headers,
     ),

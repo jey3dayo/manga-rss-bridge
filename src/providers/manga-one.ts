@@ -1,3 +1,6 @@
+import { BROWSER_USER_AGENT, HTTP_HEADERS, MIME_TYPES } from '../constants/http.ts';
+import { PROVIDERS } from '../constants/providers.ts';
+import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchBytes, fetchText } from '../lib/http.ts';
 import { extractMetaContent } from '../lib/html.ts';
 import { tryCatch } from '../lib/result.ts';
@@ -5,8 +8,7 @@ import { mangaOnePageMetadataSchema } from '../schemas/manga-one.ts';
 import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
 
 const browserHeaders = {
-  'User-Agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  [HTTP_HEADERS.userAgent]: BROWSER_USER_AGENT,
 };
 
 type ProtobufField = {
@@ -132,11 +134,11 @@ const fetchChapters = async (titleId: number, chapterId: string): Promise<FeedIt
       limit: '100',
       sort_type: 'desc',
     });
-    const data = await fetchBytes(`https://manga-one.com/api/client?${params}`, {
+    const data = await fetchBytes(`${PROVIDERS.mangaOne.baseUrl}/api/client?${params}`, {
       headers: {
         ...browserHeaders,
-        Accept: '*/*',
-        Referer: `https://manga-one.com/manga/${titleId}/chapter/${chapterId}`,
+        [HTTP_HEADERS.accept]: MIME_TYPES.any,
+        [HTTP_HEADERS.referer]: `${PROVIDERS.mangaOne.baseUrl}/manga/${titleId}/chapter/${chapterId}`,
       },
     });
     const { chapters, totalCount } = parseChapterList(data);
@@ -148,7 +150,7 @@ const fetchChapters = async (titleId: number, chapterId: string): Promise<FeedIt
       items.push({
         id: chapter.id,
         title: chapter.title,
-        url: `https://manga-one.com/manga/${titleId}/chapter/${chapter.id}`,
+        url: `${PROVIDERS.mangaOne.baseUrl}/manga/${titleId}/chapter/${chapter.id}`,
         ...(chapter.date ? { date: chapter.date } : {}),
         ...(chapter.thumbnail ? { thumbnail: chapter.thumbnail } : {}),
       });
@@ -159,11 +161,11 @@ const fetchChapters = async (titleId: number, chapterId: string): Promise<FeedIt
 };
 
 export const mangaOneProvider: Provider = {
-  id: 'manga-one',
-  siteName: 'マンガワン',
+  id: PROVIDERS.mangaOne.id,
+  siteName: PROVIDERS.mangaOne.siteName,
   fetchFeed(identifier: string) {
     return tryCatch(async (): Promise<MangaFeed> => {
-      const viewerUrl = `https://manga-one.com/viewer/${encodeURIComponent(identifier)}`;
+      const viewerUrl = `${PROVIDERS.mangaOne.baseUrl}/viewer/${encodeURIComponent(identifier)}`;
       const html = await fetchText(viewerUrl, { headers: browserHeaders });
       const metadata = mangaOnePageMetadataSchema.parse({
         title: extractMetaContent(html, 'og:title') ?? extractMetaContent(html, 'twitter:title'),
@@ -176,10 +178,12 @@ export const mangaOneProvider: Provider = {
       if (!metadata.titleId) throw new Error('MangaONE title id not found');
       const itemUrl =
         metadata.canonical ??
-        `https://manga-one.com/manga/${metadata.titleId}/chapter/${encodeURIComponent(identifier)}`;
+        `${PROVIDERS.mangaOne.baseUrl}/manga/${metadata.titleId}/chapter/${encodeURIComponent(identifier)}`;
       const items = await fetchChapters(metadata.titleId, identifier);
       return {
-        title: metadata.title?.replace(/\s+第.+$/, '') ?? `マンガワン ${identifier}`,
+        title:
+          metadata.title?.replace(/\s+第.+$/, '') ??
+          fallbackFeedTitle(PROVIDERS.mangaOne.siteName, identifier),
         link: itemUrl,
         description: metadata.description ?? '',
         items:

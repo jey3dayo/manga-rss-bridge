@@ -1,4 +1,6 @@
-import { createHtmlListProvider, titleBeforeSeparator } from './html-list.ts';
+import { PROVIDERS } from '../constants/providers.ts';
+import { titleBeforeSeparator } from '../lib/feed-title.ts';
+import { createHtmlListProvider } from './html-list.ts';
 
 const cleanAccessLabel = (title: string): string =>
   title
@@ -8,14 +10,16 @@ const cleanAccessLabel = (title: string): string =>
     .trim();
 
 export const mangaboxProvider = createHtmlListProvider({
-  id: 'mangabox',
-  siteName: 'マンガボックス',
-  url: (readerId) => `https://www.mangabox.me/reader/${encodeURIComponent(readerId)}/episodes/all/`,
+  id: PROVIDERS.mangabox.id,
+  siteName: PROVIDERS.mangabox.siteName,
+  url: (readerId) =>
+    `${PROVIDERS.mangabox.baseUrl}/reader/${encodeURIComponent(readerId)}/episodes/all/`,
   itemClass: '_episodes__item',
   linkPattern: /<a[^>]+href=["']([^"']*\/reader\/[^"']+\/episodes\/[^"']+)["'][^>]*>/i,
   titlePattern:
     /<div[^>]+class=["'][^"']*_volume_[^"']*["'][^>]*>([\s\S]*?)<\/div>|<span[^>]*>([\s\S]*?)<\/span>/i,
   thumbnailPattern: /<img[^>]+src=["']([^"']+)["'][^>]*>/i,
   cleanItemTitle: cleanAccessLabel,
-  feedTitle: (html, identifier) => titleBeforeSeparator(html, `マンガボックス ${identifier}`),
+  feedTitle: (html, identifier) =>
+    titleBeforeSeparator(html, PROVIDERS.mangabox.siteName, identifier),
 });

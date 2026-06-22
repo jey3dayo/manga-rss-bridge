@@ -1,3 +1,4 @@
+import { PROVIDERS } from '../constants/providers.ts';
 import { fetchText } from '../lib/http.ts';
 import {
   absoluteUrl,
@@ -36,12 +37,12 @@ const parseEpisodeItems = (html: string, baseUrl: string): FeedItem[] =>
   ).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
 
 export const yanmagaProvider: Provider = {
-  id: 'yanmaga',
-  siteName: 'ヤンマガWeb',
+  id: PROVIDERS.yanmaga.id,
+  siteName: PROVIDERS.yanmaga.siteName,
   fetchFeed(identifier: string) {
     return tryCatch(async (): Promise<MangaFeed> => {
       const slug = identifier.replaceAll('_', '×');
-      const link = `https://yanmaga.jp/comics/${encodeURIComponent(slug)}?sort=older`;
+      const link = `${PROVIDERS.yanmaga.baseUrl}/comics/${encodeURIComponent(slug)}?sort=older`;
       const html = await fetchText(link);
       return {
         title:

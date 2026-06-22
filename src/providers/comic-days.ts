@@ -1,3 +1,6 @@
+import { HTTP_HEADERS, MIME_TYPES } from '../constants/http.ts';
+import { PROVIDERS } from '../constants/providers.ts';
+import { normalizeSiteWrappedTitle } from '../lib/feed-title.ts';
 import { fetchText } from '../lib/http.ts';
 import { decodeHtml } from '../lib/html.ts';
 import { tryCatch } from '../lib/result.ts';
@@ -17,11 +20,6 @@ const extractAttribute = (
   if (!tagMatch?.[1]) return undefined;
   const attributeMatch = new RegExp(`${attributeName}="([^"]*)"`).exec(tagMatch[1]);
   return attributeMatch?.[1] ? decodeHtml(attributeMatch[1].trim()) : undefined;
-};
-
-const normalizeTitle = (title: string, seriesId: string): string => {
-  const comicDaysTitle = /^コミックDAYS（(.+)）$/.exec(title);
-  return comicDaysTitle?.[1]?.trim() || title || `コミックDAYS ${seriesId}`;
 };
 
 const extractItems = (xml: string): MangaFeed['items'] => {
@@ -48,20 +46,25 @@ const extractItems = (xml: string): MangaFeed['items'] => {
 };
 
 export const comicDaysProvider: Provider = {
-  id: 'comic-days',
-  siteName: 'コミックDAYS',
+  id: PROVIDERS.comicDays.id,
+  siteName: PROVIDERS.comicDays.siteName,
   fetchFeed(seriesId: string) {
     return tryCatch(async (): Promise<MangaFeed> => {
-      const rssUrl = `https://comic-days.com/rss/series/${encodeURIComponent(seriesId)}`;
+      const rssUrl = `${PROVIDERS.comicDays.baseUrl}/rss/series/${encodeURIComponent(seriesId)}`;
       const xml = await fetchText(rssUrl, {
         headers: {
-          Accept: 'application/rss+xml, application/xml, text/xml',
+          [HTTP_HEADERS.accept]: MIME_TYPES.rssXmlList,
         },
       });
-      const title = normalizeTitle(extractTag(xml, 'title') ?? '', seriesId);
+      const title = normalizeSiteWrappedTitle(
+        extractTag(xml, 'title') ?? '',
+        PROVIDERS.comicDays.siteName,
+        seriesId,
+      );
       const description = extractTag(xml, 'description') ?? '';
       const link =
-        extractTag(xml, 'link') ?? `https://comic-days.com/series/${encodeURIComponent(seriesId)}`;
+        extractTag(xml, 'link') ??
+        `${PROVIDERS.comicDays.baseUrl}/series/${encodeURIComponent(seriesId)}`;
       return {
         title,
         link,

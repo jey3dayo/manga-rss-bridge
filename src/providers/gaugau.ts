@@ -1,3 +1,5 @@
+import { PROVIDERS } from '../constants/providers.ts';
+import { titleBeforeSeparator } from '../lib/feed-title.ts';
 import { fetchText } from '../lib/http.ts';
 import {
   absoluteUrl,
@@ -8,7 +10,6 @@ import {
 } from '../lib/html.ts';
 import { tryCatch } from '../lib/result.ts';
 import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
-import { titleBeforeSeparator } from './html-list.ts';
 
 const fragmentId = (value: string): string =>
   `episode-${value.replaceAll(/[^\p{L}\p{N}]+/gu, '-').replaceAll(/^-|-$/g, '')}`;
@@ -40,14 +41,14 @@ const parseItems = (html: string, link: string): FeedItem[] =>
   );
 
 export const gaugauProvider: Provider = {
-  id: 'gaugau',
-  siteName: 'がうがうモンスター＋',
+  id: PROVIDERS.gaugau.id,
+  siteName: PROVIDERS.gaugau.siteName,
   fetchFeed(workId: string) {
     return tryCatch(async (): Promise<MangaFeed> => {
-      const link = `https://gaugau.futabanet.jp/list/work/${encodeURIComponent(workId)}/episodes`;
+      const link = `${PROVIDERS.gaugau.baseUrl}/list/work/${encodeURIComponent(workId)}/episodes`;
       const html = await fetchText(link);
       return {
-        title: titleBeforeSeparator(html, `がうがうモンスター＋ ${workId}`),
+        title: titleBeforeSeparator(html, PROVIDERS.gaugau.siteName, workId),
         link,
         description: extractMetaContent(html, 'description') ?? '',
         items: parseItems(html, link),

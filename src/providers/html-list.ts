@@ -3,7 +3,6 @@ import {
   absoluteUrl,
   extractBlocksByClass,
   extractMetaContent,
-  extractTitle,
   stripTags,
   uniqueByUrl,
 } from '../lib/html.ts';
@@ -87,8 +86,3 @@ export const createHtmlListProvider = (options: HtmlListProviderOptions): Provid
     });
   },
 });
-
-export const titleBeforeSeparator = (html: string, fallback: string): string =>
-  (extractMetaContent(html, 'og:title') ?? extractTitle(html) ?? fallback)
-    .split(/[｜|]/)[0]
-    ?.trim() ?? fallback;

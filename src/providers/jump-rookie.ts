@@ -1,3 +1,5 @@
+import { PROVIDERS } from '../constants/providers.ts';
+import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchText } from '../lib/http.ts';
 import { absoluteUrl, extractMetaContent, stripTags, uniqueByUrl } from '../lib/html.ts';
 import { tryCatch } from '../lib/result.ts';
@@ -35,14 +37,16 @@ const parseItems = (html: string, baseUrl: string, seriesId: string): FeedItem[]
   );
 
 export const jumpRookieProvider: Provider = {
-  id: 'jump-rookie',
-  siteName: 'ジャンプルーキー！',
+  id: PROVIDERS.jumpRookie.id,
+  siteName: PROVIDERS.jumpRookie.siteName,
   fetchFeed(seriesId: string) {
     return tryCatch(async (): Promise<MangaFeed> => {
-      const link = `https://rookie.shonenjump.com/series/${encodeURIComponent(seriesId)}`;
+      const link = `${PROVIDERS.jumpRookie.baseUrl}/series/${encodeURIComponent(seriesId)}`;
       const html = await fetchText(link);
       return {
-        title: extractMetaContent(html, 'og:title') ?? `ジャンプルーキー ${seriesId}`,
+        title:
+          extractMetaContent(html, 'og:title') ??
+          fallbackFeedTitle(PROVIDERS.jumpRookie.siteName, seriesId),
         link,
         description: extractMetaContent(html, 'description') ?? '',
         items: parseItems(html, link, seriesId),

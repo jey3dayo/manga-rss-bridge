@@ -17,9 +17,13 @@ const parseEpisodeItems = (html: string, baseUrl: string): FeedItem[] =>
       if (!href) return [];
       const url = absoluteUrl(href, baseUrl);
       const title =
-        /<p[^>]+class=["'][^"']*mod-episode-title[^"']*["'][^>]*>([\s\S]*?)<\/p>/i.exec(block)?.[1] ??
-        /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>/i.exec(block)?.[1];
-      const date = /<time[^>]*class=["'][^"']*mod-episode-date[^"']*["'][^>]*>([\s\S]*?)<\/time>/i.exec(block)?.[1];
+        /<p[^>]+class=["'][^"']*mod-episode-title[^"']*["'][^>]*>([\s\S]*?)<\/p>/i.exec(
+          block,
+        )?.[1] ?? /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>/i.exec(block)?.[1];
+      const date =
+        /<time[^>]*class=["'][^"']*mod-episode-date[^"']*["'][^>]*>([\s\S]*?)<\/time>/i.exec(
+          block,
+        )?.[1];
       const thumbnail = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i.exec(block)?.[1];
       return {
         id: new URL(url).pathname.split('/').filter(Boolean).at(-1) ?? url,
@@ -41,7 +45,9 @@ export const yanmagaProvider: Provider = {
       const html = await fetchText(link);
       return {
         title:
-          extractMetaContent(html, 'og:title')?.replace(/『|』|【無料公開中】|ヤンマガWeb/g, '').trim() ??
+          extractMetaContent(html, 'og:title')
+            ?.replace(/『|』|【無料公開中】|ヤンマガWeb/g, '')
+            .trim() ??
           extractTitle(html) ??
           identifier,
         link,

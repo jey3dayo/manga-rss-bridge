@@ -96,10 +96,14 @@ const parseChapter = (data: Uint8Array): MangaOneChapter | undefined => {
       chapter.date = decodeText(field.value);
     }
   }
-  return chapter.id && chapter.title ? { id: chapter.id, title: chapter.title, ...chapter } : undefined;
+  return chapter.id && chapter.title
+    ? { id: chapter.id, title: chapter.title, ...chapter }
+    : undefined;
 };
 
-const parseChapterList = (data: Uint8Array): { chapters: MangaOneChapter[]; totalCount: number } => {
+const parseChapterList = (
+  data: Uint8Array,
+): { chapters: MangaOneChapter[]; totalCount: number } => {
   const chapters: MangaOneChapter[] = [];
   let totalCount = 0;
   for (const field of readFields(data)) {
@@ -163,7 +167,8 @@ export const mangaOneProvider: Provider = {
       const html = await fetchText(viewerUrl, { headers: browserHeaders });
       const metadata = mangaOnePageMetadataSchema.parse({
         title: extractMetaContent(html, 'og:title') ?? extractMetaContent(html, 'twitter:title'),
-        description: extractMetaContent(html, 'description') ?? extractMetaContent(html, 'og:description'),
+        description:
+          extractMetaContent(html, 'description') ?? extractMetaContent(html, 'og:description'),
         canonical: extractCanonical(html) ?? extractMetaContent(html, 'og:url'),
         image: extractMetaContent(html, 'og:image') ?? extractMetaContent(html, 'twitter:image'),
         titleId: extractTitleId(html),

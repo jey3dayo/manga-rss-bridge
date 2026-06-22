@@ -1,25 +1,22 @@
 import { fetchText } from '../lib/http.ts';
+import { decodeHtml } from '../lib/html.ts';
 import { tryCatch } from '../lib/result.ts';
 import type { MangaFeed, Provider } from '../types/feed.ts';
 
-const decodeXml = (value: string): string =>
-  value
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&apos;', "'")
-    .replaceAll('&amp;', '&');
-
 const extractTag = (xml: string, tagName: string): string | undefined => {
   const match = new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)</${tagName}>`).exec(xml);
-  return match?.[1] ? decodeXml(match[1].trim()) : undefined;
+  return match?.[1] ? decodeHtml(match[1].trim()) : undefined;
 };
 
-const extractAttribute = (xml: string, tagName: string, attributeName: string): string | undefined => {
+const extractAttribute = (
+  xml: string,
+  tagName: string,
+  attributeName: string,
+): string | undefined => {
   const tagMatch = new RegExp(`<${tagName}\\s+([^>]*)/?>`).exec(xml);
   if (!tagMatch?.[1]) return undefined;
   const attributeMatch = new RegExp(`${attributeName}="([^"]*)"`).exec(tagMatch[1]);
-  return attributeMatch?.[1] ? decodeXml(attributeMatch[1].trim()) : undefined;
+  return attributeMatch?.[1] ? decodeHtml(attributeMatch[1].trim()) : undefined;
 };
 
 const normalizeTitle = (title: string, seriesId: string): string => {
@@ -63,7 +60,8 @@ export const comicDaysProvider: Provider = {
       });
       const title = normalizeTitle(extractTag(xml, 'title') ?? '', seriesId);
       const description = extractTag(xml, 'description') ?? '';
-      const link = extractTag(xml, 'link') ?? `https://comic-days.com/series/${encodeURIComponent(seriesId)}`;
+      const link =
+        extractTag(xml, 'link') ?? `https://comic-days.com/series/${encodeURIComponent(seriesId)}`;
       return {
         title,
         link,

@@ -26,7 +26,8 @@ export const extractTitle = (html: string): string | undefined => {
   return match?.[1] ? stripTags(match[1]) : undefined;
 };
 
-export const absoluteUrl = (url: string, base: string): string => new URL(decodeHtml(url), base).toString();
+export const absoluteUrl = (url: string, base: string): string =>
+  new URL(decodeHtml(url), base).toString();
 
 export const uniqueByUrl = <T extends { url: string }>(items: T[]): T[] => {
   const seen = new Set<string>();
@@ -39,7 +40,10 @@ export const uniqueByUrl = <T extends { url: string }>(items: T[]): T[] => {
 
 export const extractBlocksByClass = (html: string, className: string): string[] => {
   const blocks: string[] = [];
-  const pattern = new RegExp(`<([a-z0-9]+)(?=[^>]*class=["'][^"']*${className}[^"']*["'])[^>]*>`, 'gi');
+  const pattern = new RegExp(
+    `<([a-z0-9]+)(?=[^>]*class=["'][^"']*${className}[^"']*["'])[^>]*>`,
+    'gi',
+  );
   for (const match of html.matchAll(pattern)) {
     if (match.index === undefined || !match[1]) continue;
     const tagName = match[1];

@@ -37,11 +37,13 @@ const firstAttr = (html: string, pattern: RegExp, base: string): string | undefi
 
 const idFromUrl = (url: string): string => {
   const parsed = new URL(url);
-  return parsed.pathname
-    .split('/')
-    .filter(Boolean)
-    .at(-1)
-    ?.replace(/\.html?$/, '') ?? url;
+  return (
+    parsed.pathname
+      .split('/')
+      .filter(Boolean)
+      .at(-1)
+      ?.replace(/\.html?$/, '') ?? url
+  );
 };
 
 const parseItems = (html: string, baseUrl: string, options: HtmlListProviderOptions): FeedItem[] =>
@@ -49,7 +51,9 @@ const parseItems = (html: string, baseUrl: string, options: HtmlListProviderOpti
     extractBlocksByClass(html, options.itemClass).flatMap((block) => {
       const url = firstAttr(block, options.linkPattern, baseUrl);
       if (!url) return [];
-      const title = options.titlePattern ? firstMatch(block, options.titlePattern) : stripTags(block);
+      const title = options.titlePattern
+        ? firstMatch(block, options.titlePattern)
+        : stripTags(block);
       const rawTitle = title ?? '';
       const cleanTitle = options.cleanItemTitle?.(rawTitle) ?? rawTitle;
       const date = options.datePattern ? firstMatch(block, options.datePattern) : undefined;
@@ -85,5 +89,6 @@ export const createHtmlListProvider = (options: HtmlListProviderOptions): Provid
 });
 
 export const titleBeforeSeparator = (html: string, fallback: string): string =>
-  (extractMetaContent(html, 'og:title') ?? extractTitle(html) ?? fallback).split(/[｜|]/)[0]?.trim() ??
-  fallback;
+  (extractMetaContent(html, 'og:title') ?? extractTitle(html) ?? fallback)
+    .split(/[｜|]/)[0]
+    ?.trim() ?? fallback;

@@ -14,7 +14,8 @@ export const firecrossProvider = createHtmlListProvider({
   url: (seriesId) => `https://firecross.jp/ebook/series/${encodeURIComponent(seriesId)}`,
   itemClass: 'shop-item--episode',
   linkPattern: /<a[^>]+href=["']([^"']+)["'][^>]*>/i,
-  titlePattern: /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>|<div[^>]+class=["'][^"']*title[^"']*["'][^>]*>([\s\S]*?)<\/div>/i,
+  titlePattern:
+    /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>|<div[^>]+class=["'][^"']*title[^"']*["'][^>]*>([\s\S]*?)<\/div>/i,
   datePattern: /(\d{4}[./年-]\d{1,2}[./月-]\d{1,2}日?)/,
   thumbnailPattern: /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i,
   feedTitle: (html, identifier) => titleBeforeSeparator(html, `ファイアCROSS ${identifier}`),

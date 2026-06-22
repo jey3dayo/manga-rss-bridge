@@ -17,11 +17,14 @@ const parseItems = (html: string, link: string): FeedItem[] =>
   uniqueByUrl(
     extractBlocksByClass(html, 'episode__grid').map((block, index) => {
       const number = stripTags(
-        /<div[^>]+class=["'][^"']*episode__num[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(block)?.[1] ??
-          `episode ${index + 1}`,
+        /<div[^>]+class=["'][^"']*episode__num[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(
+          block,
+        )?.[1] ?? `episode ${index + 1}`,
       );
       const title = stripTags(
-        /<div[^>]+class=["'][^"']*episode__title[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(block)?.[1] ?? '',
+        /<div[^>]+class=["'][^"']*episode__title[^"']*["'][^>]*>([\s\S]*?)<\/div>/i.exec(
+          block,
+        )?.[1] ?? '',
       );
       const date = /(\d{4}年\d{2}月\d{2}日|\d{4}[/-]\d{1,2}[/-]\d{1,2})/.exec(block)?.[1];
       const thumbnail = /<img[^>]+src=["']([^"']+)["'][^>]*>/i.exec(block)?.[1];

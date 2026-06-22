@@ -6,24 +6,46 @@ node = "24"
 "npm:pnpm" = "11.8.0"
 
 [tasks.format]
-description = "Format files with Biome"
-run = "pnpm run format"
-run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome format --write ."'
+description = "Format all files"
+depends = ["format:biome", "format:md"]
 
 [tasks."format:check"]
-description = "Check formatting with Biome"
-run = "pnpm run format:check"
-run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome format ."'
+description = "Check formatting"
+depends = ["format:biome:check", "lint:md"]
 
 [tasks.lint]
-description = "Lint files with Biome"
-run = "pnpm run lint"
-run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome lint ."'
+description = "Lint all files"
+depends = ["lint:biome", "lint:md"]
 
 [tasks."lint:fix"]
 description = "Apply safe Biome lint fixes"
 run = "pnpm run lint:fix"
 run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome lint --write ."'
+
+[tasks."format:biome"]
+description = "Format files with Biome"
+run = "pnpm run format"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome format --write ."'
+
+[tasks."format:biome:check"]
+description = "Check Biome formatting"
+run = "pnpm run format:check"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome format ."'
+
+[tasks."format:md"]
+description = "Format Markdown"
+run = "pnpm run format:md"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/markdownlint-cli2/markdownlint-cli2.mjs --fix"'
+
+[tasks."lint:biome"]
+description = "Lint files with Biome"
+run = "pnpm run lint"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/@biomejs/biome/bin/biome lint ."'
+
+[tasks."lint:md"]
+description = "Lint Markdown"
+run = "pnpm run lint:md"
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/markdownlint-cli2/markdownlint-cli2.mjs"'
 
 [tasks.check]
 description = "Run TypeScript type checking"

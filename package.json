@@ -10,8 +10,10 @@
     "build": "pnpm exec tsc -p tsconfig.json",
     "format": "pnpm exec biome format --write .",
     "format:check": "pnpm exec biome format .",
+    "format:md": "pnpm exec markdownlint-cli2 --fix",
     "lint": "pnpm exec biome lint .",
     "lint:fix": "pnpm exec biome lint --write .",
+    "lint:md": "pnpm exec markdownlint-cli2",
     "check": "pnpm exec tsc -p tsconfig.json --noEmit",
     "test": "pnpm exec vitest run src",
     "test:watch": "pnpm exec vitest src"
@@ -33,6 +35,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.0",
     "@types/node": "^26.0.0",
+    "markdownlint-cli2": "^0.22.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   },

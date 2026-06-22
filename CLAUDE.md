@@ -32,9 +32,10 @@ This file is the short repository-local workflow guide for agents.
 
 - `mise run check` is the TypeScript type gate.
 - `mise run ci` is the full aggregate gate and runs `format:check`, `lint`, `check`, `test`, and `build`.
-- `mise run format` applies Biome formatting.
-- `mise run format:check` and `mise run lint` are the Biome read-only gates.
-- `mise run format`, `mise run format:check`, `mise run lint`, `mise run lint:fix`, `mise run check`, `mise run test`, `mise run build`, and `mise run dev` map to the existing package scripts.
+- `mise run format` applies Biome formatting and Markdown lint autofix.
+- `mise run format:check` and `mise run lint` are the Biome and Markdown read-only gates.
+- `mise run format:biome`, `mise run format:md`, `mise run lint:biome`, and `mise run lint:md` run the individual formatter or linter tasks.
+- `mise run format`, `mise run format:check`, `mise run lint`, `mise run lint:fix`, `mise run check`, `mise run test`, `mise run build`, and `mise run dev` map to the existing package scripts or aggregate them.
 - If mise is unavailable, use the equivalent `pnpm` script directly.
 - Before publishing or Docker handoff, also build the Docker image or document why it was not run.
 

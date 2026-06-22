@@ -58,7 +58,7 @@ export const comicDaysProvider: Provider = {
       });
       const title = normalizeSiteWrappedTitle(
         extractTag(xml, 'title') ?? '',
-        PROVIDERS.comicDays.siteName,
+        PROVIDERS.comicDays,
         seriesId,
       );
       const description = extractTag(xml, 'description') ?? '';

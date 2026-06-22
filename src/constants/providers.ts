@@ -1,3 +1,7 @@
+import { providerMetadataSchema } from '../schemas/provider.ts';
+
+const defineProvider = providerMetadataSchema.parse;
+
 export const PROVIDERS = {
   comicDays: {
     id: 'comic-days',
@@ -49,4 +53,8 @@ export const PROVIDERS = {
     siteName: 'ヤンマガWeb',
     baseUrl: 'https://yanmaga.jp',
   },
-} as const;
+} as const satisfies Record<string, ReturnType<typeof defineProvider>>;
+
+for (const provider of Object.values(PROVIDERS)) {
+  defineProvider(provider);
+}

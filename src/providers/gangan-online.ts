@@ -53,8 +53,7 @@ export const ganganOnlineProvider: Provider = {
   fetchFeed(titleId: string) {
     return tryCatch(async (): Promise<MangaFeed> => {
       const title = await fetchTitle(titleId);
-      const titleName =
-        title.titleName ?? fallbackFeedTitle(PROVIDERS.ganganOnline.siteName, titleId);
+      const titleName = title.titleName ?? fallbackFeedTitle(PROVIDERS.ganganOnline, titleId);
       const description = title.description ?? '';
       const link = `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}`;
       const items = (title.chapters ?? [])

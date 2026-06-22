@@ -20,6 +20,5 @@ export const mangaboxProvider = createHtmlListProvider({
     /<div[^>]+class=["'][^"']*_volume_[^"']*["'][^>]*>([\s\S]*?)<\/div>|<span[^>]*>([\s\S]*?)<\/span>/i,
   thumbnailPattern: /<img[^>]+src=["']([^"']+)["'][^>]*>/i,
   cleanItemTitle: cleanAccessLabel,
-  feedTitle: (html, identifier) =>
-    titleBeforeSeparator(html, PROVIDERS.mangabox.siteName, identifier),
+  feedTitle: (html, identifier) => titleBeforeSeparator(html, PROVIDERS.mangabox, identifier),
 });

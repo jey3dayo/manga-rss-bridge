@@ -48,7 +48,7 @@ export const gaugauProvider: Provider = {
       const link = `${PROVIDERS.gaugau.baseUrl}/list/work/${encodeURIComponent(workId)}/episodes`;
       const html = await fetchText(link);
       return {
-        title: titleBeforeSeparator(html, PROVIDERS.gaugau.siteName, workId),
+        title: titleBeforeSeparator(html, PROVIDERS.gaugau, workId),
         link,
         description: extractMetaContent(html, 'description') ?? '',
         items: parseItems(html, link),

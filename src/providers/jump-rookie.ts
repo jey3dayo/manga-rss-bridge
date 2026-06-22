@@ -45,8 +45,7 @@ export const jumpRookieProvider: Provider = {
       const html = await fetchText(link);
       return {
         title:
-          extractMetaContent(html, 'og:title') ??
-          fallbackFeedTitle(PROVIDERS.jumpRookie.siteName, seriesId),
+          extractMetaContent(html, 'og:title') ?? fallbackFeedTitle(PROVIDERS.jumpRookie, seriesId),
         link,
         description: extractMetaContent(html, 'description') ?? '',
         items: parseItems(html, link, seriesId),

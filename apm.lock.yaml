@@ -1,0 +1,32 @@
+lockfile_version: '1'
+generated_at: '2026-07-10T02:28:43.367721+00:00'
+apm_version: 0.22.0
+dependencies:
+- repo_url: _local/manga-rss-bridge
+  name: manga-rss-bridge
+  version: 0.0.0
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/manga-rss-bridge
+  - .agents/skills/manga-rss-bridge/SKILL.md
+  - .agents/skills/manga-rss-bridge/agents/openai.yaml
+  - .agents/skills/manga-rss-bridge/references/usage.md
+  - .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py
+  deployed_file_hashes:
+    .agents/skills/manga-rss-bridge/SKILL.md: sha256:6ff43f861842631f239f9c87be0a643a6f96140a355b52640f75790bb8bae43b
+    .agents/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
+    .agents/skills/manga-rss-bridge/references/usage.md: sha256:388507bb88468ea3e45e54107a973cb9edae8d6069d08aa1959d983cb90a1dac
+    .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:a37200bcb2bd120687d3855196bba7ffd7fbdc6653c2c9eb8fc7a240e1cb1b61
+  source: local
+  local_path: ./.apm/skills/manga-rss-bridge
+local_deployed_files:
+- .agents/skills/manga-rss-bridge
+- .agents/skills/manga-rss-bridge/SKILL.md
+- .agents/skills/manga-rss-bridge/agents/openai.yaml
+- .agents/skills/manga-rss-bridge/references/usage.md
+- .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py
+local_deployed_file_hashes:
+  .agents/skills/manga-rss-bridge/SKILL.md: sha256:6ff43f861842631f239f9c87be0a643a6f96140a355b52640f75790bb8bae43b
+  .agents/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
+  .agents/skills/manga-rss-bridge/references/usage.md: sha256:388507bb88468ea3e45e54107a973cb9edae8d6069d08aa1959d983cb90a1dac
+  .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:a37200bcb2bd120687d3855196bba7ffd7fbdc6653c2c9eb8fc7a240e1cb1b61

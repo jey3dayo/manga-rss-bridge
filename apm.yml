@@ -1,0 +1,10 @@
+name: manga-rss-bridge
+version: 1.0.0
+description: APM project for manga-rss-bridge
+author: jey3dayo
+dependencies:
+  apm:
+    - ./.apm/skills/manga-rss-bridge
+  mcp: []
+includes: auto
+scripts: {}

@@ -11,16 +11,23 @@ import {
 import { tryCatch } from '../lib/result.ts';
 import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
 
+const attrValue = (block: string, name: string): string | undefined =>
+  new RegExp(`${name}=["']([^"']+)["']`, 'i').exec(block)?.[1];
+
 const parseEpisodeItems = (html: string, baseUrl: string): FeedItem[] =>
   uniqueByUrl(
-    extractBlocksByClass(html, 'mod-episode').flatMap((block) => {
-      const href = /<a[^>]+href=["']([^"']+)["'][^>]*>/i.exec(block)?.[1];
+    extractBlocksByClass(html, 'mod-episode-item').flatMap((block) => {
+      const href =
+        attrValue(block, 'data-original-url') ??
+        /<a[^>]+href=["']([^"']+)["'][^>]*>/i.exec(block)?.[1];
       if (!href) return [];
       const url = absoluteUrl(href, baseUrl);
       const title =
+        attrValue(block, 'data-episode-title') ??
         /<p[^>]+class=["'][^"']*mod-episode-title[^"']*["'][^>]*>([\s\S]*?)<\/p>/i.exec(
           block,
-        )?.[1] ?? /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>/i.exec(block)?.[1];
+        )?.[1] ??
+        /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>/i.exec(block)?.[1];
       const date =
         /<time[^>]*class=["'][^"']*mod-episode-date[^"']*["'][^>]*>([\s\S]*?)<\/time>/i.exec(
           block,
@@ -48,6 +55,7 @@ export const yanmagaProvider: Provider = {
         title:
           extractMetaContent(html, 'og:title')
             ?.replace(/『|』|【無料公開中】|ヤンマガWeb/g, '')
+            .replace(/\s*\|\s*$/, '')
             .trim() ??
           extractTitle(html) ??
           identifier,

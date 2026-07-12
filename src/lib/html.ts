@@ -52,7 +52,6 @@ export const extractBlocksByClass = (html: string, className: string): string[] 
     if (openEnd < 0) continue;
     let depth = 1;
     const tagPattern = new RegExp(`</?${tagName}(?:\\s[^>]*)?>`, 'gi');
-    tagPattern.lastIndex = openEnd + 1;
     for (const tagMatch of html.slice(openEnd + 1).matchAll(tagPattern)) {
       const absoluteIndex = openEnd + 1 + (tagMatch.index ?? 0);
       if (tagMatch[0].startsWith(`</`)) {

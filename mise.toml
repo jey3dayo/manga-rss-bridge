@@ -1,5 +1,5 @@
 [settings]
-# pnpm の版は package.json の packageManager が正本（CI の pnpm/action-setup と同じ所を読む）
+# pnpm の版は package.json の packageManager が正本
 idiomatic_version_file_enable_tools = ["pnpm"]
 
 [env]

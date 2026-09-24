@@ -11,7 +11,7 @@ Use this skill for the `manga-rss-bridge` repository and the related self-hosted
 
 Source order:
 
-1. Read repository-local `AGENTS.md`, then `CLAUDE.md`.
+1. Read repository-local `AGENTS.md`.
 2. Use `README.md` as the source of truth for product usage, supported providers, setup, Docker, and policy.
 3. Use `mise.toml` and `package.json` for current command definitions.
 

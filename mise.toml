@@ -1,9 +1,12 @@
+[settings]
+# pnpm の版は package.json の packageManager が正本（CI の pnpm/action-setup と同じ所を読む）
+idiomatic_version_file_enable_tools = ["pnpm"]
+
 [env]
 _.path = ["./node_modules/.bin"]
 
 [tools]
 node = "24"
-pnpm = "11.8.0"
 
 [tasks.format]
 description = "Format all files"

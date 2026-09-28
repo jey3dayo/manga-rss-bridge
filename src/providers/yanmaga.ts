@@ -48,7 +48,7 @@ export const yanmagaProvider: Provider = {
   siteName: PROVIDERS.yanmaga.siteName,
   fetchFeed(identifier: string) {
     return tryCatch(async (): Promise<MangaFeed> => {
-      const slug = identifier.replaceAll('_', '×');
+      const slug = identifier;
       const link = `${PROVIDERS.yanmaga.baseUrl}/comics/${encodeURIComponent(slug)}?sort=older`;
       const html = await fetchText(link);
       return {

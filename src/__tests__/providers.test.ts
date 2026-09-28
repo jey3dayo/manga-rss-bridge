@@ -100,6 +100,25 @@ describe('providers', () => {
     expect(result.value.items[1]?.title).toBe('第112話');
   });
 
+  it('preserves underscores in Yanmaga identifiers', async () => {
+    let requestedUrl: string | undefined;
+    const fetchMock: typeof fetch = async (input) => {
+      requestedUrl = String(input);
+      return new Response(
+        '<head><meta property="og:title" content="『キミイロ×ライバー』 | ヤンマガWeb" /></head>',
+      );
+    };
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await yanmagaProvider.fetchFeed('キミイロライバー_今夜もベルに教えてください');
+    if (Result.isFailure(result)) throw result.error;
+
+    expect(requestedUrl).toBe(
+      'https://yanmaga.jp/comics/%E3%82%AD%E3%83%9F%E3%82%A4%E3%83%AD%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC_%E4%BB%8A%E5%A4%9C%E3%82%82%E3%83%99%E3%83%AB%E3%81%AB%E6%95%99%E3%81%88%E3%81%A6%E3%81%8F%E3%81%A0%E3%81%95%E3%81%84?sort=older',
+    );
+    expect(result.value.title).toBe('キミイロ×ライバー');
+  });
+
   it('parses Comic DAYS official RSS', async () => {
     const fetchMock: typeof fetch = async () =>
       new Response(

@@ -106,10 +106,21 @@ kubectl -n freshrss exec deployment/freshrss -- sh -lc \
   'php /var/www/FreshRSS/cli/export-opml-for-user.php --user <user> | grep -F "manga-feeds.freshrss.svc.cluster.local:8080/<provider>/<identifier>.xml"'
 ```
 
-Generate OPML with the bundled script:
+Generate OPML with the bundled TypeScript script on a machine with Node.js 24.2+.
+Check `node --version` first. The script uses only Node built-ins, so a copied
+skill does not need `pnpm install`, a build, or a global TypeScript runner.
+The `.mts` extension keeps it usable in both ESM and CommonJS projects.
+Run it from the skill directory, or replace the script path with its full path.
+In this repository, that path is
+`.apm/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts`.
+Node availability on the homelab/Pi is not assumed: generate the file on your
+Node-equipped workstation and then copy it to FreshRSS as shown below.
+
+The options and `changedetection.io` default category are unchanged. Existing
+commands need to replace `python3` with `node` and the `.py` suffix with `.mts`:
 
 ```bash
-python3 scripts/generate_freshrss_opml.py \
+node scripts/generate_freshrss_opml.mts \
   --provider pixiv-comic \
   --work-id 8789 \
   --feed-title "楠木さんは高校デビューに失敗している" \

@@ -60,11 +60,12 @@ pnpm test:opml
 pnpm build
 ```
 
-`pnpm test` runs the TypeScript suite. `pnpm test:opml` runs the offline Python
-OPML generator suite and requires Python 3.10+ available as `python3`.
-On Windows, use `mise run test:opml` with Python 3.10+ available as `python`.
+`pnpm test` runs the service TypeScript suite. `pnpm test:opml` runs the offline
+TypeScript OPML generator suite, including the standalone Node.js 24.2+ CLI.
+Neither suite requires Python. `pnpm check` typechecks the service, generator,
+and tests; `pnpm build` still emits only the service under `dist/`.
 
-Use `mise run ci` for the full format, lint, typecheck, TypeScript test, Python
+Use `mise run ci` for the full format, lint, typecheck, service test,
 OPML test, and build gate. Install dependencies first with
 `mise exec -- pnpm install --frozen-lockfile`.
 Pull requests run this same aggregate gate in the read-only CI workflow.

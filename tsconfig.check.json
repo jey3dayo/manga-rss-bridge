@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    ".apm/skills/manga-rss-bridge/scripts/*.mts",
+    ".agents/skills/manga-rss-bridge/scripts/*.mts"
+  ]
+}

@@ -31,7 +31,7 @@ This file is the short repository-local workflow guide for agents.
 
 - `mise run check` is the TypeScript type gate.
 - `mise run ci` is the full aggregate gate and runs `format:check`, `lint`, `check`, `test`, `test:opml`, and `build`.
-- `mise run test` runs Vitest. `mise run test:opml` runs the offline Python OPML generator suite and requires Python 3.10+ (`python3` on Unix, `python` on Windows).
+- `mise run test` runs the service Vitest suite. `mise run test:opml` runs the offline TypeScript OPML generator suite with Node.js 24.2+; no Python is required. `mise run check` typechecks both suites and the standalone generator.
 - `mise run format` applies Biome formatting and Markdown lint autofix.
 - `mise run format:check` and `mise run lint` are the Biome and Markdown read-only gates.
 - `mise run format:biome`, `mise run format:md`, `mise run lint:biome`, and `mise run lint:md` run the individual formatter or linter tasks.

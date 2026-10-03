@@ -14,9 +14,9 @@
     "lint": "pnpm exec biome lint .",
     "lint:fix": "pnpm exec biome lint --write .",
     "lint:md": "pnpm exec markdownlint-cli2",
-    "check": "pnpm exec tsc -p tsconfig.json --noEmit",
+    "check": "pnpm exec tsc -p tsconfig.check.json",
     "test": "pnpm exec vitest run src",
-    "test:opml": "python3 -B -m unittest discover -s tests -p \"test_*.py\" -v",
+    "test:opml": "pnpm exec vitest run tests/generate_freshrss_opml.test.ts",
     "test:watch": "pnpm exec vitest src"
   },
   "keywords": [

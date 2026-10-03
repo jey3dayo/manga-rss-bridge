@@ -20,11 +20,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
-        with:
-          python-version: "3.12"
-
       - name: Set up mise tools
         uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
@@ -36,7 +31,6 @@ jobs:
           mise --version
           test "$(mise exec -- node --version)" = "v24.19.0"
           test "$(mise exec -- pnpm --version)" = "11.8.0"
-          python3 --version
 
       - name: Install dependencies
         timeout-minutes: 5

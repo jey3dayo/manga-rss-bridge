@@ -30,6 +30,7 @@ http://localhost:8080/firecross/331.xml
 http://localhost:8080/jump-rookie/zGZPbQ9GPgM.xml
 http://localhost:8080/hayacomic/a947a3d0ec0a1.xml
 http://localhost:8080/mangabox/251785.xml
+http://localhost:8080/pixiv-comic/8789.xml
 ```
 
 ## Docker
@@ -80,12 +81,14 @@ FreshRSS subscription URLs:
 ```text
 http://manga-feeds.freshrss.svc.cluster.local:8080/gangan-online/<title-id>.xml
 http://manga-feeds.freshrss.svc.cluster.local:8080/yanmaga/<slug>.xml
+http://manga-feeds.freshrss.svc.cluster.local:8080/pixiv-comic/<work-id>.xml
 ```
 
 Provider notes:
 
 - Gangan ONLINE: title ID comes from `https://www.ganganonline.com/title/<title-id>`.
 - ヤンマガWeb: slug comes from `https://yanmaga.jp/comics/<slug>`.
+- Pixivコミック: work ID comes from `https://comic.pixiv.net/works/<work-id>`. The provider uses only the publicly exposed work/episode metadata APIs, does not fetch episode content or images, and does not use login-required preview APIs. The site's internal API may change.
 
 Check service reachability:
 
@@ -107,10 +110,10 @@ Generate OPML with the bundled script:
 
 ```bash
 python3 scripts/generate_freshrss_opml.py \
-  --provider <gangan-online|yanmaga> \
-  --slug <title-id-or-slug> \
-  --feed-title "<manga-title>" \
-  --category changedetection.io \
+  --provider pixiv-comic \
+  --work-id 8789 \
+  --feed-title "楠木さんは高校デビューに失敗している" \
+  --category "Comic - Manga RSS" \
   --output /tmp/manga-feed.opml
 ```
 

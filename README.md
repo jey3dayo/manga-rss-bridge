@@ -18,6 +18,7 @@ self-hosted use.
 - ジャンプルーキー！: `/jump-rookie/<series-id>.xml`
 - ハヤコミ: `/hayacomic/<series-id>.xml`
 - マンガボックス: `/mangabox/<reader-id>.xml`
+- pixivコミック: `/pixiv-comic/<work-id>.xml`
 
 Examples:
 
@@ -32,7 +33,10 @@ http://localhost:8080/firecross/331.xml
 http://localhost:8080/jump-rookie/zGZPbQ9GPgM.xml
 http://localhost:8080/hayacomic/a947a3d0ec0a1.xml
 http://localhost:8080/mangabox/251785.xml
+http://localhost:8080/pixiv-comic/8789.xml
 ```
+
+The Pixiv Comic provider reads publicly exposed work and episode metadata only. It links to the official viewer and does not fetch episode text, images, or login-required preview data; Pixiv may change its undocumented web API.
 
 ## Development
 

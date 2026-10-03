@@ -8,6 +8,8 @@ export const HTTP_HEADERS = {
   acceptLanguage: 'Accept-Language',
   contentType: 'Content-Type',
   referer: 'Referer',
+  origin: 'Origin',
+  xRequestedWith: 'X-Requested-With',
   userAgent: 'User-Agent',
 } as const;
 

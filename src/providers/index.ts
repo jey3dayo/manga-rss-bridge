@@ -8,6 +8,7 @@ import { jumpRookieProvider } from './jump-rookie.ts';
 import { kadocomiProvider } from './kadocomi.ts';
 import { mangaOneProvider } from './manga-one.ts';
 import { mangaboxProvider } from './mangabox.ts';
+import { pixivComicProvider } from './pixiv-comic.ts';
 import { yanmagaProvider } from './yanmaga.ts';
 
 const providers = new Map<string, Provider>([
@@ -20,6 +21,7 @@ const providers = new Map<string, Provider>([
   [kadocomiProvider.id, kadocomiProvider],
   [mangaOneProvider.id, mangaOneProvider],
   [mangaboxProvider.id, mangaboxProvider],
+  [pixivComicProvider.id, pixivComicProvider],
   [yanmagaProvider.id, yanmagaProvider],
 ]);
 

@@ -60,11 +60,14 @@ pnpm test:opml
 pnpm build
 ```
 
-`pnpm test` runs the TypeScript suite. `pnpm test:opml` runs the offline Python
-OPML generator suite and requires Python 3.10+ available as `python3`.
-On Windows, use `mise run test:opml` with Python 3.10+ available as `python`.
+`pnpm test` runs the service TypeScript suite. `pnpm test:opml` runs the offline
+TypeScript OPML generator suite, including the standalone Node.js 24.3+ (24.x) CLI.
+Node 24.3 is the minimum because earlier releases emit type-stripping warnings
+and do not satisfy the CLI test contract. CI checks both 24.3.0 and 24.19.0.
+Neither suite requires Python. `pnpm check` typechecks the service, generator,
+and tests; `pnpm build` still emits only the service under `dist/`.
 
-Use `mise run ci` for the full format, lint, typecheck, TypeScript test, Python
+Use `mise run ci` for the full format, lint, typecheck, service test,
 OPML test, and build gate. Install dependencies first with
 `mise exec -- pnpm install --frozen-lockfile`.
 Pull requests run this same aggregate gate in the read-only CI workflow.
@@ -91,6 +94,26 @@ If it stalls, run each leaf task separately with the same options:
 but the aggregate stalls. A timeout or task-start message is not a successful
 gate; keep the original environment's failure open until it is reproduced or
 verified there.
+
+## FreshRSS OPML
+
+The bundled generator creates an OPML file for one manga title. It defaults to
+this user's `Comic - Manga RSS` category. Use `--category changedetection.io`
+only when quarantine is explicitly requested; other setups can pass their own
+category. Generating a file does not change existing FreshRSS feeds or categories.
+
+```bash
+node .apm/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts \
+  --provider pixiv-comic \
+  --work-id 8789 \
+  --feed-title "楠木さんは高校デビューに失敗している" \
+  --output /tmp/manga-feed.opml
+```
+
+Before an authorized import, check for the exact subscription URL to avoid
+registering it twice. Follow the [FreshRSS operations guide](.apm/skills/manga-rss-bridge/references/usage.md#freshrss-homelab-operations)
+for single-title import, refresh scope, and target-feed-only article checks.
+The guide is the source of truth for copied skills and consumer documentation.
 
 ## Docker
 

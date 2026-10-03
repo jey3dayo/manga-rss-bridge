@@ -53,7 +53,7 @@ run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise wh
 [tasks.check]
 description = "Run TypeScript type checking"
 run = "pnpm run check"
-run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/typescript/bin/tsc -p tsconfig.json --noEmit"'
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/typescript/bin/tsc -p tsconfig.check.json"'
 
 [tasks.test]
 description = "Run Vitest once"
@@ -61,9 +61,9 @@ run = "pnpm run test"
 run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/vitest/vitest.mjs run src"'
 
 [tasks."test:opml"]
-description = "Run the offline Python OPML generator tests"
+description = "Run the offline TypeScript OPML generator tests"
 run = "pnpm run test:opml"
-run_windows = 'python -B -m unittest discover -s tests -p "test_*.py" -v'
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/vitest/vitest.mjs run tests/generate_freshrss_opml.test.ts"'
 
 [tasks.build]
 description = "Build the service"

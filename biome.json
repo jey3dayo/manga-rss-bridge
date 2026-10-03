@@ -20,6 +20,17 @@
     }
   },
   "files": {
-    "includes": ["src/**/*.ts", "*.json", "*.md", "*.yaml", "*.yml", "!dist", "!node_modules"]
+    "includes": [
+      "src/**/*.ts",
+      "tests/**/*.ts",
+      ".apm/skills/manga-rss-bridge/scripts/*.mts",
+      ".agents/skills/manga-rss-bridge/scripts/*.mts",
+      "*.json",
+      "*.md",
+      "*.yaml",
+      "*.yml",
+      "!dist",
+      "!node_modules"
+    ]
   }
 }

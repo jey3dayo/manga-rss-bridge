@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-10-03T08:58:52.320173+00:00'
+generated_at: '2026-10-03T19:15:13.755683+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: _local/manga-rss-bridge
@@ -11,12 +11,12 @@ dependencies:
   - .agents/skills/manga-rss-bridge/SKILL.md
   - .agents/skills/manga-rss-bridge/agents/openai.yaml
   - .agents/skills/manga-rss-bridge/references/usage.md
-  - .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py
+  - .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts
   deployed_file_hashes:
-    .agents/skills/manga-rss-bridge/SKILL.md: sha256:9fb88c800765ce67629874ae219371cd22066b1aae7af355fd247f9b422cd79d
+    .agents/skills/manga-rss-bridge/SKILL.md: sha256:2f919d8829fb0e9b73d44c97b6732328694b7275838651d858aab93e89d2864e
     .agents/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
-    .agents/skills/manga-rss-bridge/references/usage.md: sha256:0bd67ebf52f1b10dc133d233d29b70e15e7e0ad4006a8608cafc18a28a58a724
-    .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:c7e0425677d6d9083f5ae1bfd512b1782533868d7f1f971ed8d1b6279c797bf9
+    .agents/skills/manga-rss-bridge/references/usage.md: sha256:dc339cadc8719fa0fc33b5238a96e30b863bec71b8f949eb4e0205086cac249c
+    .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts: sha256:02ade2fbc027b78eee46cf4fc868e77a10e2a3b1fa4fcc2d1260a78fae3dafd0
   source: local
   local_path: ./.apm/skills/manga-rss-bridge
 deployments:
@@ -39,7 +39,7 @@ deployments:
   - ./.apm/skills/manga-rss-bridge
   - .
   active_owner: ./.apm/skills/manga-rss-bridge
-  content_hash: sha256:9fb88c800765ce67629874ae219371cd22066b1aae7af355fd247f9b422cd79d
+  content_hash: sha256:2f919d8829fb0e9b73d44c97b6732328694b7275838651d858aab93e89d2864e
 - kind: project-relative
   target: codex
   value: .agents/skills/manga-rss-bridge/agents/openai.yaml
@@ -59,25 +59,25 @@ deployments:
   - ./.apm/skills/manga-rss-bridge
   - .
   active_owner: ./.apm/skills/manga-rss-bridge
-  content_hash: sha256:0bd67ebf52f1b10dc133d233d29b70e15e7e0ad4006a8608cafc18a28a58a724
+  content_hash: sha256:dc339cadc8719fa0fc33b5238a96e30b863bec71b8f949eb4e0205086cac249c
 - kind: project-relative
   target: codex
-  value: .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py
+  value: .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts
   runtime: null
   scope: project
   owners:
   - ./.apm/skills/manga-rss-bridge
   - .
   active_owner: ./.apm/skills/manga-rss-bridge
-  content_hash: sha256:c7e0425677d6d9083f5ae1bfd512b1782533868d7f1f971ed8d1b6279c797bf9
+  content_hash: sha256:02ade2fbc027b78eee46cf4fc868e77a10e2a3b1fa4fcc2d1260a78fae3dafd0
 local_deployed_files:
 - .agents/skills/manga-rss-bridge
 - .agents/skills/manga-rss-bridge/SKILL.md
 - .agents/skills/manga-rss-bridge/agents/openai.yaml
 - .agents/skills/manga-rss-bridge/references/usage.md
-- .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py
+- .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts
 local_deployed_file_hashes:
-  .agents/skills/manga-rss-bridge/SKILL.md: sha256:9fb88c800765ce67629874ae219371cd22066b1aae7af355fd247f9b422cd79d
+  .agents/skills/manga-rss-bridge/SKILL.md: sha256:2f919d8829fb0e9b73d44c97b6732328694b7275838651d858aab93e89d2864e
   .agents/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
-  .agents/skills/manga-rss-bridge/references/usage.md: sha256:0bd67ebf52f1b10dc133d233d29b70e15e7e0ad4006a8608cafc18a28a58a724
-  .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.py: sha256:c7e0425677d6d9083f5ae1bfd512b1782533868d7f1f971ed8d1b6279c797bf9
+  .agents/skills/manga-rss-bridge/references/usage.md: sha256:dc339cadc8719fa0fc33b5238a96e30b863bec71b8f949eb4e0205086cac249c
+  .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts: sha256:02ade2fbc027b78eee46cf4fc868e77a10e2a3b1fa4fcc2d1260a78fae3dafd0

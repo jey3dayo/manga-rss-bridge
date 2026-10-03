@@ -31,7 +31,7 @@ This file is the short repository-local workflow guide for agents.
 
 - `mise run check` is the TypeScript type gate.
 - `mise run ci` is the full aggregate gate and runs `format:check`, `lint`, `check`, `test`, `test:opml`, and `build`.
-- `mise run test` runs Vitest. `mise run test:opml` runs the offline Python OPML generator suite and requires Python 3.10+ (`python3` on Unix, `python` on Windows).
+- `mise run test` runs the service Vitest suite. `mise run test:opml` runs the offline TypeScript OPML generator suite with Node.js 24.3+ (24.x); no Python is required. `mise run check` typechecks both suites and the standalone generator.
 - `mise run format` applies Biome formatting and Markdown lint autofix.
 - `mise run format:check` and `mise run lint` are the Biome and Markdown read-only gates.
 - `mise run format:biome`, `mise run format:md`, `mise run lint:biome`, and `mise run lint:md` run the individual formatter or linter tasks.
@@ -45,6 +45,7 @@ This file is the short repository-local workflow guide for agents.
 - Derive runtime-boundary types from schemas with `z.infer` or `z.output`.
 - Provider implementations should return `Result<MangaFeed, Error>` through the provider contract.
 - Avoid `as` assertions except at narrow boundary points after validation or filtering.
+- Edit bundled skills under `.apm/skills/`, then run `apm install --only apm --target codex` (APM 0.31.0) from the repository root to regenerate `.agents/skills/` and `apm.lock.yaml`. Do not hand-edit generated skill copies.
 - Do not add code that bypasses authentication, paid content, DRM, or access controls.
 - Keep provider fetch intervals and README wording respectful of source-site terms.
 - Put temporary research artifacts under `tmp/` when this repository has one; otherwise use `/tmp` and do not commit generated OPML or scraped dumps.

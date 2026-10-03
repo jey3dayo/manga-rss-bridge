@@ -60,6 +60,11 @@ description = "Run Vitest once"
 run = "pnpm run test"
 run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/vitest/vitest.mjs run src"'
 
+[tasks."test:opml"]
+description = "Run the offline Python OPML generator tests"
+run = "pnpm run test:opml"
+run_windows = 'python -B -m unittest discover -s tests -p "test_*.py" -v'
+
 [tasks.build]
 description = "Build the service"
 run = "pnpm run build"
@@ -77,5 +82,6 @@ run = [
   { task = "lint" },
   { task = "check" },
   { task = "test" },
+  { task = "test:opml" },
   { task = "build" },
 ]

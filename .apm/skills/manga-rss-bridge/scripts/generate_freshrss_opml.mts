@@ -81,7 +81,7 @@ Usage: node generate_freshrss_opml.mts [options]
   --slug <slug>       Provider slug, including URL-encoded yanmaga comics slugs
   --work-id <id>      Pixiv Comic work ID
   --feed-title <text> FreshRSS feed title (required)
-  --category <text>   FreshRSS category (default: changedetection.io)
+  --category <text>   FreshRSS category (default: Comic - Manga RSS)
   --output <path>     Output path; stdout when omitted
   -h, --help         Show this help
 `;
@@ -97,7 +97,7 @@ const main = (): void => {
         slug: { type: 'string' },
         'work-id': { type: 'string' },
         'feed-title': { type: 'string' },
-        category: { type: 'string', default: 'changedetection.io' },
+        category: { type: 'string', default: 'Comic - Manga RSS' },
         output: { type: 'string' },
         help: { type: 'boolean', short: 'h' },
       },

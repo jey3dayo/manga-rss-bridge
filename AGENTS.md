@@ -45,6 +45,7 @@ This file is the short repository-local workflow guide for agents.
 - Derive runtime-boundary types from schemas with `z.infer` or `z.output`.
 - Provider implementations should return `Result<MangaFeed, Error>` through the provider contract.
 - Avoid `as` assertions except at narrow boundary points after validation or filtering.
+- Edit bundled skills under `.apm/skills/`, then run `apm install --only apm --target codex` (APM 0.31.0) from the repository root to regenerate `.agents/skills/` and `apm.lock.yaml`. Do not hand-edit generated skill copies.
 - Do not add code that bypasses authentication, paid content, DRM, or access controls.
 - Keep provider fetch intervals and README wording respectful of source-site terms.
 - Put temporary research artifacts under `tmp/` when this repository has one; otherwise use `/tmp` and do not commit generated OPML or scraped dumps.

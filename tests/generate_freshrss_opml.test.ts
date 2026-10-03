@@ -72,25 +72,28 @@ describe('FreshRSS OPML generator', () => {
     );
   });
 
-  it('keeps the default provider, category, title-id alias, and slug precedence', () => {
+  it('defaults to the user manga category and keeps provider and identifier aliases', () => {
     const result = run(['--title-id', '2061', '--feed-title', '作品']);
     expect(result.status, result.stderr).toBe(0);
-    expect(result.stdout).toBe(buildOpml('gangan-online', '2061', '作品', 'changedetection.io'));
+    expect(result.stdout).toBe(buildOpml('gangan-online', '2061', '作品', 'Comic - Manga RSS'));
     const slugResult = run(['--title-id', '2061', '--slug', '999', '--feed-title', '作品']);
     expect(slugResult.status, slugResult.stderr).toBe(0);
-    expect(slugResult.stdout).toBe(buildOpml('gangan-online', '999', '作品', 'changedetection.io'));
+    expect(slugResult.stdout).toBe(buildOpml('gangan-online', '999', '作品', 'Comic - Manga RSS'));
+    const pixivResult = run(pixivArgs);
+    expect(pixivResult.status, pixivResult.stderr).toBe(0);
+    expect(pixivResult.stdout).toBe(buildOpml('pixiv-comic', '8789', '例', 'Comic - Manga RSS'));
   });
 
   it('honors an explicit category and UTF-8 output file without stdout', () => {
     const directory = mkdtempSync(join(tmpdir(), 'manga-opml-'));
     try {
       const output = join(directory, '漫画.opml');
-      const result = run([...pixivArgs, '--category', 'Comic - Manga RSS', '--output', output]);
+      const result = run([...pixivArgs, '--category', 'changedetection.io', '--output', output]);
       expect(result.status, result.stderr).toBe(0);
       expect(result.stdout).toBe('');
       expect(result.stderr).toBe('');
       expect(readFileSync(output, 'utf8')).toBe(
-        buildOpml('pixiv-comic', '8789', '例', 'Comic - Manga RSS'),
+        buildOpml('pixiv-comic', '8789', '例', 'changedetection.io'),
       );
       const failed = run([...pixivArgs, '--output', join(directory, 'missing', 'feed.opml')]);
       expect(failed.status).toBe(1);
@@ -131,7 +134,7 @@ describe('FreshRSS OPML generator', () => {
       const result = run([flag]);
       expect(result.status, result.stderr).toBe(0);
       expect(result.stdout).toContain('--work-id');
-      expect(result.stdout).toContain('changedetection.io');
+      expect(result.stdout).toContain('default: Comic - Manga RSS');
     }
   });
 
@@ -150,7 +153,7 @@ describe('FreshRSS OPML generator', () => {
       });
       expect(result.status, result.stderr).toBe(0);
       expect(result.stderr).toBe('');
-      expect(result.stdout).toBe(buildOpml('pixiv-comic', '8789', '例', 'changedetection.io'));
+      expect(result.stdout).toBe(buildOpml('pixiv-comic', '8789', '例', 'Comic - Manga RSS'));
     } finally {
       rmSync(directory, { recursive: true, force: true });
     }

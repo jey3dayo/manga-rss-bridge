@@ -95,6 +95,26 @@ but the aggregate stalls. A timeout or task-start message is not a successful
 gate; keep the original environment's failure open until it is reproduced or
 verified there.
 
+## FreshRSS OPML
+
+The bundled generator creates an OPML file for one manga title. It defaults to
+this user's `Comic - Manga RSS` category. Use `--category changedetection.io`
+only when quarantine is explicitly requested; other setups can pass their own
+category. Generating a file does not change existing FreshRSS feeds or categories.
+
+```bash
+node .apm/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts \
+  --provider pixiv-comic \
+  --work-id 8789 \
+  --feed-title "楠木さんは高校デビューに失敗している" \
+  --output /tmp/manga-feed.opml
+```
+
+Before an authorized import, check for the exact subscription URL to avoid
+registering it twice. Follow the [FreshRSS operations guide](.apm/skills/manga-rss-bridge/references/usage.md#freshrss-homelab-operations)
+for single-title import, refresh scope, and target-feed-only article checks.
+The guide is the source of truth for copied skills and consumer documentation.
+
 ## Docker
 
 ```bash

@@ -74,7 +74,7 @@ Use this section when adding, verifying, quarantining, or troubleshooting manga 
 
 Expected outcome: one FreshRSS feed per manga title, where each chapter appears as a separate RSS item. Do not use changedetection.io RSS for chapter-level manga feeds; changedetection.io is only for coarse page-change alerts.
 
-Default new or experimental `manga-feeds` subscriptions to the FreshRSS `changedetection.io` category as a quarantine area. Move stable feeds to `Comic` later from the UI. Do not move categories in the database unless explicitly asked.
+For this user, default new `manga-feeds` subscriptions to `Comic - Manga RSS`. Use `changedetection.io` only when quarantine is explicitly requested. Other FreshRSS setups can choose a category with `--category`; do not treat quarantine as this user's default. Never move existing feeds or categories automatically, through either the UI or the database.
 
 FreshRSS subscription URLs:
 
@@ -99,12 +99,31 @@ kubectl -n freshrss run manga-feeds-check --rm -i --restart=Never \
   curl -fsS http://manga-feeds:8080/<provider>/<identifier>.xml
 ```
 
-Check whether a feed is already registered. Show only the matching line and do not dump full OPML because existing feeds may contain private tokens:
+Set the target account and exact subscription URL, then check whether it is
+already registered. For the homelab SQLite setup, this read-only query prints
+only matching feed IDs, names, and categories. It does not export unrelated feeds
+or URLs that may contain private tokens. Replace the example account and URL
+before running it; keep them for the import and verification below.
 
 ```bash
-kubectl -n freshrss exec deployment/freshrss -- sh -lc \
-  'php /var/www/FreshRSS/cli/export-opml-for-user.php --user <user> | grep -F "manga-feeds.freshrss.svc.cluster.local:8080/<provider>/<identifier>.xml"'
+freshrss_user='<user>'
+feed_url='http://manga-feeds.freshrss.svc.cluster.local:8080/pixiv-comic/8789.xml'
+kubectl -n freshrss exec deployment/freshrss -- php -r '
+$path = "/var/www/FreshRSS/data/users/" . $argv[1] . "/db.sqlite";
+if (!is_file($path)) { throw new RuntimeException("User database not found"); }
+$db = new PDO("sqlite:" . $path);
+$db->exec("PRAGMA query_only = ON");
+$q = $db->prepare("SELECT f.id, f.name, c.name AS category FROM feed f LEFT JOIN category c ON c.id = f.category WHERE f.url = ?");
+$q->execute([$argv[2]]);
+foreach ($q as $r) { echo $r["id"] . "|" . $r["name"] . "|" . $r["category"] . "\n"; }
+' "$freshrss_user" "$feed_url"
 ```
+
+If a match exists, skip the import and verify that feed. Do not re-register or
+move it to another category automatically. Multiple matches or a failed query
+require investigation; only a successful query with no matches permits a new
+single-title import. For a non-SQLite setup, check that exact URL in the FreshRSS
+subscription UI instead of applying these SQL examples.
 
 Generate OPML with the bundled TypeScript script on a machine with Node.js 24.3+ (24.x).
 Check `node --version` first. The script uses only Node built-ins, so a copied
@@ -116,19 +135,22 @@ In this repository, that path is
 Node availability on the homelab/Pi is not assumed: generate the file on your
 Node-equipped workstation and then copy it to FreshRSS as shown below.
 
-The options and `changedetection.io` default category are unchanged. Existing
-commands need to replace `python3` with `node` and the `.py` suffix with `.mts`:
+The CLI options are unchanged, and the default category is now `Comic - Manga RSS`.
+Existing commands need to replace `python3` with `node` and the `.py` suffix with
+`.mts`. The example omits `--category` to use the default; add
+`--category changedetection.io` only for an explicitly requested quarantine.
 
 ```bash
 node scripts/generate_freshrss_opml.mts \
   --provider pixiv-comic \
   --work-id 8789 \
   --feed-title "楠木さんは高校デビューに失敗している" \
-  --category "Comic - Manga RSS" \
   --output /tmp/manga-feed.opml
 ```
 
-Import into FreshRSS:
+After import is authorized and the duplicate check is clear, confirm the generated
+OPML contains only the requested title and exact `xmlUrl`. Import that file for
+the selected account; never substitute a full OPML export or import unrelated feeds:
 
 ```bash
 pod=$(kubectl -n freshrss get pod -l app=freshrss \
@@ -137,20 +159,42 @@ pod=$(kubectl -n freshrss get pod -l app=freshrss \
 kubectl -n freshrss cp /tmp/manga-feed.opml "$pod:/tmp/manga-feed.opml"
 kubectl -n freshrss exec "$pod" -- \
   php /var/www/FreshRSS/cli/import-for-user.php \
-    --user=<user> \
+    --user="$freshrss_user" \
     --filename=/tmp/manga-feed.opml
 ```
 
-Refresh and verify:
+Refresh and verify only the target feed from the FreshRSS UI when that is the
+requested scope. The CLI command below refreshes the selected **account**, not
+one feed; use it only when an account-wide refresh has been explicitly approved.
+Check the installed CLI's `--help` before relying on version-specific feed filters.
 
 ```bash
-kubectl -n freshrss exec "$pod" -- \
-  php /var/www/FreshRSS/cli/actualize-user.php --user=<user>
-kubectl -n freshrss exec "$pod" -- php -r '$db=new PDO("sqlite:/var/www/FreshRSS/data/users/<user>/db.sqlite"); foreach($db->query("select name,url from feed where url like \"%manga-feeds.freshrss.svc.cluster.local%<identifier>.xml%\"") as $r){echo $r["name"]."|".$r["url"]."\n";}'
+kubectl -n freshrss exec deployment/freshrss -- \
+  php /var/www/FreshRSS/cli/actualize-user.php --user="$freshrss_user"
+```
+
+After the requested refresh, verify the target feed's category and article count
+using exact URL equality. This query does not print article bodies or unrelated
+subscriptions. Do not hard-code the historical count of 12 articles: public
+availability can change. Inspect that feed's recent chapter titles and official
+links in the UI if further verification is needed.
+
+```bash
+kubectl -n freshrss exec deployment/freshrss -- php -r '
+$path = "/var/www/FreshRSS/data/users/" . $argv[1] . "/db.sqlite";
+if (!is_file($path)) { throw new RuntimeException("User database not found"); }
+$db = new PDO("sqlite:" . $path);
+$db->exec("PRAGMA query_only = ON");
+$q = $db->prepare("SELECT f.id, f.name, c.name AS category, COUNT(e.id) AS articles FROM feed f LEFT JOIN category c ON c.id = f.category LEFT JOIN entry e ON e.id_feed = f.id WHERE f.url = ? GROUP BY f.id, f.name, c.name");
+$q->execute([$argv[2]]);
+foreach ($q as $r) { echo $r["id"] . "|" . $r["name"] . "|" . $r["category"] . "|" . $r["articles"] . "\n"; }
+' "$freshrss_user" "$feed_url"
 ```
 
 Safety notes:
 
 - Do not print full FreshRSS OPML exports.
 - Do not commit generated OPML files.
-- Do not delete existing changedetection.io feeds automatically.
+- Do not delete existing changedetection.io feeds or move existing categories automatically.
+- OPML/import/refresh examples are instructions for authorized operations, not a request to repeat an existing registration.
+- This repo-local guide is the source of truth. Refresh downstream skill copies through APM after publishing source changes; do not hand-edit generated copies.

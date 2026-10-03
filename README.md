@@ -61,7 +61,9 @@ pnpm build
 ```
 
 `pnpm test` runs the service TypeScript suite. `pnpm test:opml` runs the offline
-TypeScript OPML generator suite, including the standalone Node.js 24.2+ CLI.
+TypeScript OPML generator suite, including the standalone Node.js 24.3+ (24.x) CLI.
+Node 24.3 is the minimum because earlier releases emit type-stripping warnings
+and do not satisfy the CLI test contract. CI checks both 24.3.0 and 24.19.0.
 Neither suite requires Python. `pnpm check` typechecks the service, generator,
 and tests; `pnpm build` still emits only the service under `dist/`.
 

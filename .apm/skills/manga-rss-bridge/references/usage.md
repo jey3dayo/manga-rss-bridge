@@ -106,7 +106,7 @@ kubectl -n freshrss exec deployment/freshrss -- sh -lc \
   'php /var/www/FreshRSS/cli/export-opml-for-user.php --user <user> | grep -F "manga-feeds.freshrss.svc.cluster.local:8080/<provider>/<identifier>.xml"'
 ```
 
-Generate OPML with the bundled TypeScript script on a machine with Node.js 24.2+.
+Generate OPML with the bundled TypeScript script on a machine with Node.js 24.3+ (24.x).
 Check `node --version` first. The script uses only Node built-ins, so a copied
 skill does not need `pnpm install`, a build, or a global TypeScript runner.
 The `.mts` extension keeps it usable in both ESM and CommonJS projects.

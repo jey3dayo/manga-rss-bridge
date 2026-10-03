@@ -117,4 +117,4 @@ pnpm run lint
 
 Read `references/usage.md` when the task is primarily about explaining current tool usage, route examples, Docker usage, or policy to a user. Do not read it for provider implementation workflow unless the user also asks for current route examples.
 
-For FreshRSS OPML import or homelab `manga-feeds` subscription checks, read `references/usage.md` and use `scripts/generate_freshrss_opml.mts` with Node.js 24.2+ instead of hand-writing OPML. The script uses Node built-ins only and works as a standalone copied skill without installing repository packages. Check `node --version` on the machine running the script first; Node availability on the FreshRSS host is not implied.
+For FreshRSS OPML import or homelab `manga-feeds` subscription checks, read `references/usage.md` and use `scripts/generate_freshrss_opml.mts` with Node.js 24.3+ (24.x) instead of hand-writing OPML. The script uses Node built-ins only and works as a standalone copied skill without installing repository packages. Check `node --version` on the machine running the script first; Node availability on the FreshRSS host is not implied.

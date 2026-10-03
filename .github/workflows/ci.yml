@@ -10,9 +10,14 @@ permissions:
 
 jobs:
   quality:
-    name: Quality gates
+    name: Quality gates (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      matrix:
+        node: ["24.3.0", "24.19.0"]
+    env:
+      MISE_NODE_VERSION: ${{ matrix.node }}
 
     steps:
       - name: Checkout
@@ -24,12 +29,12 @@ jobs:
         uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           version: "2026.10.1"
-          install_args: "node@24.19.0 pnpm@11.8.0"
+          install_args: "node@${{ matrix.node }} pnpm@11.8.0"
 
       - name: Verify toolchain
         run: |
           mise --version
-          test "$(mise exec -- node --version)" = "v24.19.0"
+          test "$(mise exec -- node --version)" = "v$MISE_NODE_VERSION"
           test "$(mise exec -- pnpm --version)" = "11.8.0"
 
       - name: Install dependencies

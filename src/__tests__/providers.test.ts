@@ -3,6 +3,8 @@ import { Result } from '../lib/result.ts';
 import { comicDaysProvider } from '../providers/comic-days.ts';
 import { ganganOnlineProvider } from '../providers/gangan-online.ts';
 import { kadocomiProvider } from '../providers/kadocomi.ts';
+import { pixivComicProvider } from '../providers/pixiv-comic.ts';
+import { getProvider } from '../providers/index.ts';
 import { yanmagaProvider } from '../providers/yanmaga.ts';
 
 describe('providers', () => {
@@ -154,5 +156,127 @@ describe('providers', () => {
       date: 'Mon, 24 Feb 2020 15:00:00 +0000',
       thumbnail: 'https://cdn-img.comic-days.com/public/episode-thumbnail/sample.jpg',
     });
+  });
+
+  it('builds a Pixiv Comic feed from published episode metadata only', async () => {
+    const calls: { url: string; headers: Headers }[] = [];
+    const fetchMock: typeof fetch = async (input, init) => {
+      const url = String(input);
+      calls.push({ url, headers: new Headers(init?.headers) });
+      if (url.endsWith('/api/app/works/v5/8789')) {
+        return new Response(
+          JSON.stringify({
+            data: {
+              official_work: {
+                id: 8789,
+                name: '楠木さんは高校デビューに失敗している',
+                author: 'みいみつき',
+              },
+            },
+          }),
+          { headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      if (url.endsWith('/api/app/works/8789/episodes/v2')) {
+        return new Response(
+          JSON.stringify({
+            data: {
+              episodes: [
+                {
+                  state: 'readable',
+                  episode: {
+                    id: 249922,
+                    numbering_title: '第58話',
+                    sub_title: 'そんなの知ってるっての',
+                    read_start_at: 1790910000000,
+                    viewer_path: '/viewer/stories/249922',
+                  },
+                },
+                {
+                  state: 'readable',
+                  episode: {
+                    id: 247033,
+                    numbering_title: '第57話',
+                    sub_title: 'ほんと何もかも恵まれてる子',
+                    read_start_at: 1788490800000,
+                    viewer_path: '/viewer/stories/247033',
+                  },
+                },
+                { state: 'not_publishing', message: '非公開エピソード' },
+                {
+                  state: 'readable',
+                  episode: {
+                    id: 1,
+                    numbering_title: '未公開',
+                    read_start_at: null,
+                    viewer_path: '/viewer/stories/1',
+                  },
+                },
+                {
+                  state: 'readable',
+                  episode: {
+                    id: 2,
+                    numbering_title: '不正なリンク',
+                    read_start_at: 1790910000000,
+                    viewer_path: 'https://example.com/private',
+                  },
+                },
+              ],
+            },
+          }),
+          { headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      return new Response('not found', { status: 404 });
+    };
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await pixivComicProvider.fetchFeed('8789');
+    if (Result.isFailure(result)) throw result.error;
+
+    expect(result.value.title).toBe('楠木さんは高校デビューに失敗している');
+    expect(result.value.link).toBe('https://comic.pixiv.net/works/8789');
+    expect(result.value.description).toBe('みいみつき');
+    expect(result.value.items).toEqual([
+      {
+        id: '249922',
+        title: '第58話 そんなの知ってるっての',
+        url: 'https://comic.pixiv.net/viewer/stories/249922',
+        date: '2026-10-02T03:00:00.000Z',
+      },
+      {
+        id: '247033',
+        title: '第57話 ほんと何もかも恵まれてる子',
+        url: 'https://comic.pixiv.net/viewer/stories/247033',
+        date: '2026-09-04T03:00:00.000Z',
+      },
+    ]);
+    expect(calls).toHaveLength(2);
+    expect(calls.map((call) => call.url)).toEqual([
+      'https://comic.pixiv.net/api/app/works/v5/8789',
+      'https://comic.pixiv.net/api/app/works/8789/episodes/v2',
+    ]);
+    for (const call of calls) {
+      expect(call.headers.get('origin')).toBe('https://comic.pixiv.net');
+      expect(call.headers.get('referer')).toBe('https://comic.pixiv.net/works/8789');
+      expect(call.headers.get('x-requested-with')).toBe('XMLHttpRequest');
+    }
+  });
+
+  it('rejects invalid Pixiv Comic work IDs without making a request', async () => {
+    let requestCount = 0;
+    vi.stubGlobal('fetch', async () => {
+      requestCount += 1;
+      return new Response('{}');
+    });
+
+    const result = await pixivComicProvider.fetchFeed('8789/../../private');
+
+    expect(Result.isFailure(result)).toBe(true);
+    expect(requestCount).toBe(0);
+  });
+
+  it('registers the Pixiv Comic provider route', () => {
+    expect(getProvider('pixiv-comic')).toBe(pixivComicProvider);
   });
 });

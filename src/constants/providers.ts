@@ -46,6 +46,11 @@ export const PROVIDERS = {
     siteName: 'マンガボックス',
     baseUrl: 'https://www.mangabox.me',
   },
+  pixivComic: {
+    id: 'pixiv-comic',
+    siteName: 'pixivコミック',
+    baseUrl: 'https://comic.pixiv.net',
+  },
   yanmaga: {
     id: 'yanmaga',
     siteName: 'ヤンマガWeb',

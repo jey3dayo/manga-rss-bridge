@@ -59,6 +59,7 @@ Supported route patterns:
 /jump-rookie/<series-id>.xml
 /hayacomic/<series-id>.xml
 /mangabox/<reader-id>.xml
+/pixiv-comic/<work-id>.xml
 ```
 
 Policy boundary: do not add code that bypasses authentication, paid content, DRM, or access controls. The bridge should only emit RSS from publicly available work or chapter metadata.

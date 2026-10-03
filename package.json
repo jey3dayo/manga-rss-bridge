@@ -16,6 +16,7 @@
     "lint:md": "pnpm exec markdownlint-cli2",
     "check": "pnpm exec tsc -p tsconfig.json --noEmit",
     "test": "pnpm exec vitest run src",
+    "test:opml": "python3 -B -m unittest discover -s tests -p \"test_*.py\" -v",
     "test:watch": "pnpm exec vitest src"
   },
   "keywords": [

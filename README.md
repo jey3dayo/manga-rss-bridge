@@ -56,8 +56,41 @@ curl http://localhost:8080/gangan-online/2061.xml
 ```bash
 pnpm check
 pnpm test
+pnpm test:opml
 pnpm build
 ```
+
+`pnpm test` runs the TypeScript suite. `pnpm test:opml` runs the offline Python
+OPML generator suite and requires Python 3.10+ available as `python3`.
+On Windows, use `mise run test:opml` with Python 3.10+ available as `python`.
+
+Use `mise run ci` for the full format, lint, typecheck, TypeScript test, Python
+OPML test, and build gate. Install dependencies first with
+`mise exec -- pnpm install --frozen-lockfile`.
+Pull requests run this same aggregate gate in the read-only CI workflow.
+Stale or missing dependencies fail before scripts run. Run the explicit install
+command above after a dependency change; quality gates do not implicitly install
+packages from parallel formatter or linter tasks.
+
+### Diagnosing a slow CI gate
+
+Record the OS, shell, `mise --version`, `mise exec -- node --version`, and
+`mise exec -- pnpm --version`. A missing `pnpm` outside mise does not establish
+why a mise task timed out.
+
+Run the gate with labelled output and a bounded execution time:
+
+```bash
+mise run --output prefix --timeout 2m ci
+```
+
+If it stalls, run each leaf task separately with the same options:
+`format:biome:check`, `lint:md`, `lint:biome`, `check`, `test`, `test:opml`, and
+`build`. Keep the full output, elapsed times, and exit status. Compare
+`mise run --jobs 1 --output prefix --timeout 2m ci` if the individual tasks pass
+but the aggregate stalls. A timeout or task-start message is not a successful
+gate; keep the original environment's failure open until it is reproduced or
+verified there.
 
 ## Docker
 

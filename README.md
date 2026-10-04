@@ -60,13 +60,15 @@ pnpm test:opml
 pnpm build
 ```
 
-`pnpm test` runs the service TypeScript suite. `pnpm test:opml` runs the offline
+`pnpm test` runs the service TypeScript suite and the build-runner regression.
+`pnpm test:opml` runs the offline
 TypeScript OPML generator suite, including the standalone Node.js 24.3+ (24.x) CLI.
 Node 24.3 is the minimum because earlier releases emit type-stripping warnings
 and do not satisfy the CLI test contract. CI checks both 24.3.0 and 24.19.0.
 Neither suite requires Python. `pnpm check` typechecks the service, generator,
 and tests. Service tests live beside their implementation as `*.test.ts`;
-`pnpm build` excludes tests and fixtures and emits only the service under `dist/`.
+`pnpm build` first cleans the project’s `dist/`, then emits only the service,
+excluding tests and fixtures. Both pnpm and mise use `scripts/build.mts`, including on Windows.
 
 Use `mise run ci` for the full format, lint, typecheck, service test,
 OPML test, and build gate. Install dependencies first with

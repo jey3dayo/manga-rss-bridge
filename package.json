@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node --watch src/server.ts",
     "start": "node dist/server.js",
-    "build": "pnpm exec tsc -p tsconfig.json",
+    "build": "node scripts/build.mts",
     "format": "pnpm exec biome format --write .",
     "format:check": "pnpm exec biome format .",
     "format:md": "pnpm exec markdownlint-cli2 --fix",
@@ -15,9 +15,9 @@
     "lint:fix": "pnpm exec biome lint --write .",
     "lint:md": "pnpm exec markdownlint-cli2",
     "check": "pnpm exec tsc -p tsconfig.check.json",
-    "test": "pnpm exec vitest run src",
+    "test": "pnpm exec vitest run src scripts",
     "test:opml": "pnpm exec vitest run tests/generate_freshrss_opml.test.ts",
-    "test:watch": "pnpm exec vitest src"
+    "test:watch": "pnpm exec vitest src scripts"
   },
   "keywords": [
     "rss",

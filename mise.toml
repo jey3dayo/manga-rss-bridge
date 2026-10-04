@@ -58,7 +58,7 @@ run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise wh
 [tasks.test]
 description = "Run Vitest once"
 run = "pnpm run test"
-run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/vitest/vitest.mjs run src"'
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/vitest/vitest.mjs run src scripts"'
 
 [tasks."test:opml"]
 description = "Run the offline TypeScript OPML generator tests"
@@ -68,7 +68,7 @@ run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise wh
 [tasks.build]
 description = "Build the service"
 run = "pnpm run build"
-run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./node_modules/typescript/bin/tsc -p tsconfig.json"'
+run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) ./scripts/build.mts"'
 
 [tasks.dev]
 description = "Run the development server"

@@ -27,13 +27,14 @@ This file is the short repository-local workflow guide for agents.
 | HTTP routes and startup | `src/app.ts` and `src/server.ts` | Keep route handling testable without opening a listening socket |
 | RSS rendering | `src/lib/rss.ts` | XML escaping, RSS shape, guid, and pubDate formatting |
 | Provider registry | `src/providers/index.ts` | Public provider IDs and dispatch routing |
+| Build entry point | `scripts/build.mts` | Clean only this project’s `dist/` before invoking TypeScript; shared by pnpm and mise |
 | Generated artifacts | `dist/` | Build output only; do not edit directly |
 
 ## Quality Gates
 
 - `mise run check` is the TypeScript type gate.
 - `mise run ci` is the full aggregate gate and runs `format:check`, `lint`, `check`, `test`, `test:opml`, and `build`.
-- `mise run test` runs the service Vitest suite. `mise run test:opml` runs the offline TypeScript OPML generator suite with Node.js 24.3+ (24.x); no Python is required. `mise run check` typechecks both suites and the standalone generator.
+- `mise run test` runs the service and build-runner Vitest suites. `mise run test:opml` runs the offline TypeScript OPML generator suite with Node.js 24.3+ (24.x); no Python is required. `mise run check` typechecks both suites and the standalone generator.
 - `mise run format` applies Biome formatting and Markdown lint autofix.
 - `mise run format:check` and `mise run lint` are the Biome and Markdown read-only gates.
 - `mise run format:biome`, `mise run format:md`, `mise run lint:biome`, and `mise run lint:md` run the individual formatter or linter tasks.

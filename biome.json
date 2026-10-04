@@ -23,6 +23,8 @@
     "includes": [
       "src/**/*.ts",
       "tests/**/*.ts",
+      "scripts/**/*.ts",
+      "scripts/**/*.mts",
       ".apm/skills/manga-rss-bridge/scripts/*.mts",
       ".agents/skills/manga-rss-bridge/scripts/*.mts",
       "*.json",

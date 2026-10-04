@@ -1,5 +1,7 @@
 import type { z } from 'zod';
 import { HTTP_HEADERS, MIME_TYPES, USER_AGENT } from '../constants/http.ts';
+import { parseSchema } from '../schemas/parse.ts';
+import { Result, type ResultAsync, toError } from './result.ts';
 
 const mergeHeaders = (
   defaults: RequestInit['headers'],
@@ -14,49 +16,55 @@ const mergeHeaders = (
   return merged;
 };
 
-export const fetchJson = async <Schema extends z.ZodType>(
+const fetchResponse = (
+  url: string,
+  init?: RequestInit,
+  defaultHeaders: Record<string, string> = {},
+): ResultAsync<Response, Error> =>
+  Result.pipe(
+    Result.try({
+      try: async () =>
+        fetch(url, {
+          ...init,
+          headers: mergeHeaders(
+            {
+              [HTTP_HEADERS.userAgent]: USER_AGENT,
+              ...defaultHeaders,
+            },
+            init?.headers,
+          ),
+        }),
+      catch: toError,
+    }),
+    Result.andThen((response) =>
+      response.ok
+        ? Result.succeed(response)
+        : Result.fail(new Error(`GET ${url} failed: ${response.status}`)),
+    ),
+  );
+
+export const fetchJson = <Schema extends z.ZodType>(
   url: string,
   schema: Schema,
   init?: RequestInit,
-): Promise<z.output<Schema>> => {
-  const response = await fetch(url, {
-    ...init,
-    headers: mergeHeaders(
-      {
-        [HTTP_HEADERS.accept]: MIME_TYPES.json,
-        [HTTP_HEADERS.userAgent]: USER_AGENT,
-      },
-      init?.headers,
-    ),
-  });
-  if (!response.ok) throw new Error(`GET ${url} failed: ${response.status}`);
-  return schema.parse(await response.json());
-};
+): ResultAsync<z.output<Schema>, Error> =>
+  Result.pipe(
+    fetchResponse(url, init, { [HTTP_HEADERS.accept]: MIME_TYPES.json }),
+    Result.andThen((response) => Result.try({ try: async () => response.json(), catch: toError })),
+    Result.andThen((body) => parseSchema(schema, body)),
+  );
 
-export const fetchText = async (url: string, init?: RequestInit): Promise<string> => {
-  const response = await fetch(url, {
-    ...init,
-    headers: mergeHeaders(
-      {
-        [HTTP_HEADERS.userAgent]: USER_AGENT,
-      },
-      init?.headers,
-    ),
-  });
-  if (!response.ok) throw new Error(`GET ${url} failed: ${response.status}`);
-  return response.text();
-};
+export const fetchText = (url: string, init?: RequestInit): ResultAsync<string, Error> =>
+  Result.pipe(
+    fetchResponse(url, init),
+    Result.andThen((response) => Result.try({ try: async () => response.text(), catch: toError })),
+  );
 
-export const fetchBytes = async (url: string, init?: RequestInit): Promise<Uint8Array> => {
-  const response = await fetch(url, {
-    ...init,
-    headers: mergeHeaders(
-      {
-        [HTTP_HEADERS.userAgent]: USER_AGENT,
-      },
-      init?.headers,
+export const fetchBytes = (url: string, init?: RequestInit): ResultAsync<Uint8Array, Error> =>
+  Result.pipe(
+    fetchResponse(url, init),
+    Result.andThen((response) =>
+      Result.try({ try: async () => response.arrayBuffer(), catch: toError }),
     ),
-  });
-  if (!response.ok) throw new Error(`GET ${url} failed: ${response.status}`);
-  return new Uint8Array(await response.arrayBuffer());
-};
+    Result.map((buffer) => new Uint8Array(buffer)),
+  );

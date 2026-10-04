@@ -14,6 +14,8 @@ export const kadocomiEpisodeSchema = z.object({
     .optional(),
 });
 
+export type KadocomiEpisode = z.infer<typeof kadocomiEpisodeSchema>;
+
 export const kadocomiWorkResponseSchema = z.object({
   work: z
     .object({

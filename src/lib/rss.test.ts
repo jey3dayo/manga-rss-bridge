@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { escapedRssFeedFixture } from '../fixtures/rss.ts';
-import { renderRss } from '../lib/rss.ts';
+import { renderRss } from './rss.ts';
 
 describe('renderRss', () => {
   it('renders escaped RSS items', () => {

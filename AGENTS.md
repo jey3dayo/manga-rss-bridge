@@ -20,18 +20,21 @@ This file is the short repository-local workflow guide for agents.
 | Product scope, setup, usage, supported providers | [README.md](README.md) | User-facing overview, examples, commands, and policy |
 | Tool versions and scripts | [mise.toml](mise.toml) and [package.json](package.json) | Toolchain versions, mise task aliases, package manager, Node engine, scripts, and dependency contract |
 | Runtime constants | `src/constants/*.ts` | Shared literals such as headers, provider IDs, and stable defaults |
-| Test fixtures | `src/fixtures/*.ts` | Reusable sample inputs for tests and parser coverage |
+| Service tests | `src/**/*.test.ts` | Co-locate tests with their implementation; keep shared provider contracts beside `src/providers/index.ts` |
+| Test fixtures | `src/fixtures/` | Reusable sample inputs; provider-specific data and helpers live under `src/fixtures/providers/` |
 | Runtime schemas | `src/schemas/*.ts` | Zod schemas for external provider responses and runtime boundaries |
-| Result boundary | `src/lib/result.ts` and provider `fetchFeed` contracts | Provider errors should be returned as `Result`, not leaked as uncaught exceptions |
+| Result boundary | `src/lib/result.ts` and `src/providers/create-provider.ts` | Provider errors should be returned as `Result`, not leaked as uncaught exceptions |
+| HTTP routes and startup | `src/app.ts` and `src/server.ts` | Keep route handling testable without opening a listening socket |
 | RSS rendering | `src/lib/rss.ts` | XML escaping, RSS shape, guid, and pubDate formatting |
 | Provider registry | `src/providers/index.ts` | Public provider IDs and dispatch routing |
+| Build entry point | `scripts/build.mts` | Clean only this project’s `dist/` before invoking TypeScript; shared by pnpm and mise |
 | Generated artifacts | `dist/` | Build output only; do not edit directly |
 
 ## Quality Gates
 
 - `mise run check` is the TypeScript type gate.
 - `mise run ci` is the full aggregate gate and runs `format:check`, `lint`, `check`, `test`, `test:opml`, and `build`.
-- `mise run test` runs the service Vitest suite. `mise run test:opml` runs the offline TypeScript OPML generator suite with Node.js 24.3+ (24.x); no Python is required. `mise run check` typechecks both suites and the standalone generator.
+- `mise run test` runs the service and build-runner Vitest suites. `mise run test:opml` runs the offline TypeScript OPML generator suite with Node.js 24.3+ (24.x); no Python is required. `mise run check` typechecks both suites and the standalone generator.
 - `mise run format` applies Biome formatting and Markdown lint autofix.
 - `mise run format:check` and `mise run lint` are the Biome and Markdown read-only gates.
 - `mise run format:biome`, `mise run format:md`, `mise run lint:biome`, and `mise run lint:md` run the individual formatter or linter tasks.
@@ -41,9 +44,11 @@ This file is the short repository-local workflow guide for agents.
 
 - Prefer TypeScript over Python for new OSS code in this repository.
 - Prefer `type` aliases for object shapes, unions, and contracts. Use `interface` only for declaration merging or external augmentation.
+- Keep service tests next to their implementation as `<module>.test.ts`; exclude tests and fixtures from the runtime build while including both in type checking.
 - Keep external provider response validation in Zod schemas under `src/schemas/*.ts`.
 - Derive runtime-boundary types from schemas with `z.infer` or `z.output`.
 - Provider implementations should return `Result<MangaFeed, Error>` through the provider contract.
+- Compose fallible HTTP, validation, and parsing steps with byethrow `andThen` or `bind`; use `map` for successful value conversion. Keep expected failures as `Result` values rather than unwrapping and rethrowing them.
 - Avoid `as` assertions except at narrow boundary points after validation or filtering.
 - Edit bundled skills under `.apm/skills/`, then run `apm install --only apm --target codex` (APM 0.31.0) from the repository root to regenerate `.agents/skills/` and `apm.lock.yaml`. Do not hand-edit generated skill copies.
 - Do not add code that bypasses authentication, paid content, DRM, or access controls.
@@ -55,7 +60,7 @@ This file is the short repository-local workflow guide for agents.
 When adding a provider:
 
 1. Add a schema file in `src/schemas/<provider>.ts` for the external JSON boundary, if the provider uses JSON.
-2. Add `src/providers/<provider>.ts` implementing `Provider`.
+2. Add `src/providers/<provider>.ts` using `createProvider` to keep retrieval, validation, and conversion failures inside the `Provider` Result boundary.
 3. Register it in `src/providers/index.ts`.
 4. Add README examples and policy notes if user-facing behavior changes.
 5. Add focused Vitest coverage for RSS rendering or provider parsing helpers. Prefer fixtures over live network tests.

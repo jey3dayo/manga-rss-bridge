@@ -13,3 +13,24 @@ export const ganganTitleSchema = z.object({
 });
 
 export type GanganTitle = z.infer<typeof ganganTitleSchema>;
+
+export const ganganNextDataSchema = z
+  .object({
+    buildId: z.string().optional(),
+    props: z.unknown().optional(),
+  })
+  .passthrough();
+
+export const ganganTitleDataSchema = z.object({
+  pageProps: z.object({
+    data: z.object({
+      default: ganganTitleSchema,
+    }),
+  }),
+});
+
+export const ganganEmbeddedTitleSchema = z.object({
+  props: ganganTitleDataSchema,
+});
+
+export type GanganNextData = z.infer<typeof ganganNextDataSchema>;

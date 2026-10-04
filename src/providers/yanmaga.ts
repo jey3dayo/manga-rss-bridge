@@ -8,61 +8,66 @@ import {
   stripTags,
   uniqueByUrl,
 } from '../lib/html.ts';
-import { tryCatch } from '../lib/result.ts';
-import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
+import { Result, toError } from '../lib/result.ts';
+import type { FeedItem } from '../types/feed.ts';
+import { createProvider } from './create-provider.ts';
 
 const attrValue = (block: string, name: string): string | undefined =>
   new RegExp(`${name}=["']([^"']+)["']`, 'i').exec(block)?.[1];
 
-const parseEpisodeItems = (html: string, baseUrl: string): FeedItem[] =>
-  uniqueByUrl(
-    extractBlocksByClass(html, 'mod-episode-item').flatMap((block) => {
-      const href =
-        attrValue(block, 'data-original-url') ??
-        /<a[^>]+href=["']([^"']+)["'][^>]*>/i.exec(block)?.[1];
-      if (!href) return [];
-      const url = absoluteUrl(href, baseUrl);
-      const title =
-        attrValue(block, 'data-episode-title') ??
-        /<p[^>]+class=["'][^"']*mod-episode-title[^"']*["'][^>]*>([\s\S]*?)<\/p>/i.exec(
-          block,
-        )?.[1] ??
-        /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>/i.exec(block)?.[1];
-      const date =
-        /<time[^>]*class=["'][^"']*mod-episode-date[^"']*["'][^>]*>([\s\S]*?)<\/time>/i.exec(
-          block,
-        )?.[1];
-      const thumbnail = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i.exec(block)?.[1];
-      return {
-        id: new URL(url).pathname.split('/').filter(Boolean).at(-1) ?? url,
-        title: title ? stripTags(title) : new URL(url).pathname,
-        url,
-        ...(date ? { date: stripTags(date) } : {}),
-        ...(thumbnail ? { thumbnail: absoluteUrl(thumbnail, baseUrl) } : {}),
-      };
-    }),
-  ).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+const parseEpisodeItems = Result.fn({
+  try: (html: string, baseUrl: string): FeedItem[] =>
+    uniqueByUrl(
+      extractBlocksByClass(html, 'mod-episode-item').flatMap((block) => {
+        const href =
+          attrValue(block, 'data-original-url') ??
+          /<a[^>]+href=["']([^"']+)["'][^>]*>/i.exec(block)?.[1];
+        if (!href) return [];
+        const url = absoluteUrl(href, baseUrl);
+        const title =
+          attrValue(block, 'data-episode-title') ??
+          /<p[^>]+class=["'][^"']*mod-episode-title[^"']*["'][^>]*>([\s\S]*?)<\/p>/i.exec(
+            block,
+          )?.[1] ??
+          /<h[0-9][^>]*>([\s\S]*?)<\/h[0-9]>/i.exec(block)?.[1];
+        const date =
+          /<time[^>]*class=["'][^"']*mod-episode-date[^"']*["'][^>]*>([\s\S]*?)<\/time>/i.exec(
+            block,
+          )?.[1];
+        const thumbnail = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i.exec(block)?.[1];
+        return {
+          id: new URL(url).pathname.split('/').filter(Boolean).at(-1) ?? url,
+          title: title ? stripTags(title) : new URL(url).pathname,
+          url,
+          ...(date ? { date: stripTags(date) } : {}),
+          ...(thumbnail ? { thumbnail: absoluteUrl(thumbnail, baseUrl) } : {}),
+        };
+      }),
+    ).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? '')),
+  catch: toError,
+});
 
-export const yanmagaProvider: Provider = {
-  id: PROVIDERS.yanmaga.id,
-  siteName: PROVIDERS.yanmaga.siteName,
-  fetchFeed(identifier: string) {
-    return tryCatch(async (): Promise<MangaFeed> => {
-      const slug = identifier;
-      const link = `${PROVIDERS.yanmaga.baseUrl}/comics/${encodeURIComponent(slug)}?sort=older`;
-      const html = await fetchText(link);
-      return {
-        title:
-          extractMetaContent(html, 'og:title')
-            ?.replace(/『|』|【無料公開中】|ヤンマガWeb/g, '')
-            .replace(/\s*\|\s*$/, '')
-            .trim() ??
-          extractTitle(html) ??
-          identifier,
-        link,
-        description: extractMetaContent(html, 'description') ?? '',
-        items: parseEpisodeItems(html, link),
-      };
-    });
-  },
-};
+export const yanmagaProvider = createProvider(PROVIDERS.yanmaga, async (identifier) =>
+  Result.pipe(
+    Result.try({
+      try: () => ({
+        link: `${PROVIDERS.yanmaga.baseUrl}/comics/${encodeURIComponent(identifier)}?sort=older`,
+      }),
+      catch: toError,
+    }),
+    Result.bind('html', ({ link }) => fetchText(link)),
+    Result.bind('items', ({ html, link }) => parseEpisodeItems(html, link)),
+    Result.map(({ html, link, items }) => ({
+      title:
+        extractMetaContent(html, 'og:title')
+          ?.replace(/『|』|【無料公開中】|ヤンマガWeb/g, '')
+          .replace(/\s*\|\s*$/, '')
+          .trim() ??
+        extractTitle(html) ??
+        identifier,
+      link,
+      description: extractMetaContent(html, 'description') ?? '',
+      items,
+    })),
+  ),
+);

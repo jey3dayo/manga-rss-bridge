@@ -3,7 +3,7 @@ import {
   fallbackFeedTitle,
   normalizeSiteWrappedTitle,
   titleBeforeSeparator,
-} from '../lib/feed-title.ts';
+} from './feed-title.ts';
 
 describe('feed title helpers', () => {
   it('builds a fallback title from site name and identifier', () => {

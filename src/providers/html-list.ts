@@ -6,8 +6,9 @@ import {
   stripTags,
   uniqueByUrl,
 } from '../lib/html.ts';
-import { tryCatch } from '../lib/result.ts';
-import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
+import { Result, toError } from '../lib/result.ts';
+import type { FeedItem, Provider } from '../types/feed.ts';
+import { createProvider } from './create-provider.ts';
 
 type HtmlListProviderOptions = {
   id: string;
@@ -45,44 +46,44 @@ const idFromUrl = (url: string): string => {
   );
 };
 
-const parseItems = (html: string, baseUrl: string, options: HtmlListProviderOptions): FeedItem[] =>
-  uniqueByUrl(
-    extractBlocksByClass(html, options.itemClass).flatMap((block) => {
-      const url = firstAttr(block, options.linkPattern, baseUrl);
-      if (!url) return [];
-      const title = options.titlePattern
-        ? firstMatch(block, options.titlePattern)
-        : stripTags(block);
-      const rawTitle = title ?? '';
-      const cleanTitle = options.cleanItemTitle?.(rawTitle) ?? rawTitle;
-      const date = options.datePattern ? firstMatch(block, options.datePattern) : undefined;
-      const thumbnail = options.thumbnailPattern
-        ? firstAttr(block, options.thumbnailPattern, baseUrl)
-        : undefined;
-      return {
-        id: idFromUrl(url),
-        title: cleanTitle || rawTitle || idFromUrl(url),
-        url,
-        ...(date ? { date } : {}),
-        ...(thumbnail ? { thumbnail } : {}),
-      };
-    }),
-  );
+const parseItems = Result.fn({
+  try: (html: string, baseUrl: string, options: HtmlListProviderOptions): FeedItem[] =>
+    uniqueByUrl(
+      extractBlocksByClass(html, options.itemClass).flatMap((block) => {
+        const url = firstAttr(block, options.linkPattern, baseUrl);
+        if (!url) return [];
+        const title = options.titlePattern
+          ? firstMatch(block, options.titlePattern)
+          : stripTags(block);
+        const rawTitle = title ?? '';
+        const cleanTitle = options.cleanItemTitle?.(rawTitle) ?? rawTitle;
+        const date = options.datePattern ? firstMatch(block, options.datePattern) : undefined;
+        const thumbnail = options.thumbnailPattern
+          ? firstAttr(block, options.thumbnailPattern, baseUrl)
+          : undefined;
+        return {
+          id: idFromUrl(url),
+          title: cleanTitle || rawTitle || idFromUrl(url),
+          url,
+          ...(date ? { date } : {}),
+          ...(thumbnail ? { thumbnail } : {}),
+        };
+      }),
+    ),
+  catch: toError,
+});
 
-export const createHtmlListProvider = (options: HtmlListProviderOptions): Provider => ({
-  id: options.id,
-  siteName: options.siteName,
-  fetchFeed(identifier: string) {
-    return tryCatch(async (): Promise<MangaFeed> => {
-      const link = options.url(identifier);
-      const html = await fetchText(link, options.init);
-      const description = extractMetaContent(html, 'description') ?? '';
-      return {
+export const createHtmlListProvider = (options: HtmlListProviderOptions): Provider =>
+  createProvider(options, async (identifier) =>
+    Result.pipe(
+      Result.try({ try: () => ({ link: options.url(identifier) }), catch: toError }),
+      Result.bind('html', ({ link }) => fetchText(link, options.init)),
+      Result.bind('items', ({ html, link }) => parseItems(html, link, options)),
+      Result.map(({ html, link, items }) => ({
         title: options.feedTitle(html, identifier),
         link,
-        description,
-        items: parseItems(html, link, options),
-      };
-    });
-  },
-});
+        description: extractMetaContent(html, 'description') ?? '',
+        items,
+      })),
+    ),
+  );

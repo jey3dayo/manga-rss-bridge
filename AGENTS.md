@@ -20,7 +20,7 @@ This file is the short repository-local workflow guide for agents.
 | Product scope, setup, usage, supported providers | [README.md](README.md) | User-facing overview, examples, commands, and policy |
 | Tool versions and scripts | [mise.toml](mise.toml) and [package.json](package.json) | Toolchain versions, mise task aliases, package manager, Node engine, scripts, and dependency contract |
 | Runtime constants | `src/constants/*.ts` | Shared literals such as headers, provider IDs, and stable defaults |
-| Test fixtures | `src/fixtures/*.ts` | Reusable sample inputs for tests and parser coverage |
+| Test fixtures | `src/fixtures/` | Reusable sample inputs; provider-specific data and helpers live under `src/fixtures/providers/` |
 | Runtime schemas | `src/schemas/*.ts` | Zod schemas for external provider responses and runtime boundaries |
 | Result boundary | `src/lib/result.ts` and `src/providers/create-provider.ts` | Provider errors should be returned as `Result`, not leaked as uncaught exceptions |
 | HTTP routes and startup | `src/app.ts` and `src/server.ts` | Keep route handling testable without opening a listening socket |
@@ -45,6 +45,7 @@ This file is the short repository-local workflow guide for agents.
 - Keep external provider response validation in Zod schemas under `src/schemas/*.ts`.
 - Derive runtime-boundary types from schemas with `z.infer` or `z.output`.
 - Provider implementations should return `Result<MangaFeed, Error>` through the provider contract.
+- Compose fallible HTTP, validation, and parsing steps with byethrow `andThen` or `bind`; use `map` for successful value conversion. Keep expected failures as `Result` values rather than unwrapping and rethrowing them.
 - Avoid `as` assertions except at narrow boundary points after validation or filtering.
 - Edit bundled skills under `.apm/skills/`, then run `apm install --only apm --target codex` (APM 0.31.0) from the repository root to regenerate `.agents/skills/` and `apm.lock.yaml`. Do not hand-edit generated skill copies.
 - Do not add code that bypasses authentication, paid content, DRM, or access controls.

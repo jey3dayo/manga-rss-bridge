@@ -1,17 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BROWSER_USER_AGENT, MIME_TYPES } from '../constants/http.ts';
 import { PROVIDERS } from '../constants/providers.ts';
+import { ganganTitle, nextDataPage } from '../fixtures/providers/gangan-online.ts';
+import { providerFixtures } from '../fixtures/providers/index.ts';
 import {
-  ganganTitle,
   mangaOneApiUrl,
   mangaOneChapterList,
   mangaOnePage,
-  nextDataPage,
-  pixivEpisodesUrl,
-  pixivWork,
-  pixivWorkUrl,
-  providerFixtures,
-} from '../fixtures/providers.ts';
+} from '../fixtures/providers/manga-one.ts';
+import { pixivEpisodesUrl, pixivWork, pixivWorkUrl } from '../fixtures/providers/pixiv-comic.ts';
 import { Result } from '../lib/result.ts';
 import { getProvider, listProviders } from '../providers/index.ts';
 
@@ -147,16 +144,22 @@ describe('Gangan ONLINE response branches', () => {
   });
 
   it.each([
-    ['missing Next data', '<html></html>'],
-    ['invalid JSON', '<script id="__NEXT_DATA__" type="application/json">{</script>'],
-    ['invalid build id', nextDataPage({ buildId: 123 })],
+    ['missing Next data', '<html></html>', 'Error'],
+    [
+      'invalid JSON',
+      '<script id="__NEXT_DATA__" type="application/json">{</script>',
+      'SyntaxError',
+    ],
+    ['invalid build id', nextDataPage({ buildId: 123 }), 'ZodError'],
     [
       'invalid embedded title',
       nextDataPage({ props: { pageProps: { data: { default: { titleName: 123 } } } } }),
+      'ZodError',
     ],
-  ])('returns an Error Result for %s', async (_name, html) => {
-    mockResponses({ [pageUrl]: html });
-    await failedFeed('gangan-online', '42');
+  ])('returns an Error Result for %s', async (_name, html, errorName) => {
+    const fetchMock = mockResponses({ [pageUrl]: html });
+    expect((await failedFeed('gangan-online', '42')).name).toBe(errorName);
+    expect(fetchMock.mock.calls.map(([input]) => String(input))).toEqual([pageUrl]);
   });
 
   it('validates build-endpoint title data rather than accepting an invalid chapter', async () => {

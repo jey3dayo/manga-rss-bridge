@@ -7,10 +7,9 @@ const metadata = { id: 'provider', siteName: 'Site' };
 
 describe('provider result boundary', () => {
   it('returns the feed without changing its metadata or identifier', async () => {
-    const provider = createProvider(metadata, async (identifier) => ({
-      ...escapedRssFeedFixture,
-      title: identifier,
-    }));
+    const provider = createProvider(metadata, async (identifier) =>
+      Result.succeed({ ...escapedRssFeedFixture, title: identifier }),
+    );
 
     expect(provider.id).toBe('provider');
     expect(provider.siteName).toBe('Site');
@@ -41,5 +40,12 @@ describe('provider result boundary', () => {
     if (Result.isSuccess(result)) throw new Error('expected failure');
     expect(result.error).toBeInstanceOf(Error);
     expect(result.error.message).toBe('upstream failed');
+  });
+
+  it('preserves a returned failure without nesting it inside a success', async () => {
+    const failure = Result.fail(new Error('invalid metadata'));
+    const provider = createProvider(metadata, async () => failure);
+
+    expect(await provider.fetchFeed('work')).toBe(failure);
   });
 });

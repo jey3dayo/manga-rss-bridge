@@ -3,7 +3,9 @@ import { PROVIDERS } from '../constants/providers.ts';
 import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchBytes, fetchText } from '../lib/http.ts';
 import { extractMetaContent } from '../lib/html.ts';
+import { Result, type ResultAsync, toError } from '../lib/result.ts';
 import { mangaOnePageMetadataSchema } from '../schemas/manga-one.ts';
+import { parseSchema } from '../schemas/parse.ts';
 import type { FeedItem } from '../types/feed.ts';
 import { createProvider } from './create-provider.ts';
 
@@ -103,26 +105,31 @@ const parseChapter = (data: Uint8Array): MangaOneChapter | undefined => {
     : undefined;
 };
 
-const parseChapterList = (
-  data: Uint8Array,
-): { chapters: MangaOneChapter[]; totalCount: number } => {
-  const chapters: MangaOneChapter[] = [];
-  let totalCount = 0;
-  for (const field of readFields(data)) {
-    if (field.field !== 1 || field.wireType !== 2 || !(field.value instanceof Uint8Array)) continue;
-    for (const child of readFields(field.value)) {
-      if (child.field === 1 && child.wireType === 2 && child.value instanceof Uint8Array) {
-        const chapter = parseChapter(child.value);
-        if (chapter) chapters.push(chapter);
-      } else if (child.field === 5 && child.wireType === 0 && typeof child.value === 'number') {
-        totalCount = child.value;
+const parseChapterList = Result.fn({
+  try: (data: Uint8Array): { chapters: MangaOneChapter[]; totalCount: number } => {
+    const chapters: MangaOneChapter[] = [];
+    let totalCount = 0;
+    for (const field of readFields(data)) {
+      if (field.field !== 1 || field.wireType !== 2 || !(field.value instanceof Uint8Array))
+        continue;
+      for (const child of readFields(field.value)) {
+        if (child.field === 1 && child.wireType === 2 && child.value instanceof Uint8Array) {
+          const chapter = parseChapter(child.value);
+          if (chapter) chapters.push(chapter);
+        } else if (child.field === 5 && child.wireType === 0 && typeof child.value === 'number') {
+          totalCount = child.value;
+        }
       }
     }
-  }
-  return { chapters, totalCount };
-};
+    return { chapters, totalCount };
+  },
+  catch: toError,
+});
 
-const fetchChapters = async (titleId: number, chapterId: string): Promise<FeedItem[]> => {
+const fetchChapters = async (
+  titleId: number,
+  chapterId: string,
+): ResultAsync<FeedItem[], Error> => {
   const seen = new Set<string>();
   const items: FeedItem[] = [];
   for (let page = 1; page <= 10; page += 1) {
@@ -134,14 +141,18 @@ const fetchChapters = async (titleId: number, chapterId: string): Promise<FeedIt
       limit: '100',
       sort_type: 'desc',
     });
-    const data = await fetchBytes(`${PROVIDERS.mangaOne.baseUrl}/api/client?${params}`, {
-      headers: {
-        ...browserHeaders,
-        [HTTP_HEADERS.accept]: MIME_TYPES.any,
-        [HTTP_HEADERS.referer]: `${PROVIDERS.mangaOne.baseUrl}/manga/${titleId}/chapter/${chapterId}`,
-      },
-    });
-    const { chapters, totalCount } = parseChapterList(data);
+    const pageResult = await Result.pipe(
+      fetchBytes(`${PROVIDERS.mangaOne.baseUrl}/api/client?${params}`, {
+        headers: {
+          ...browserHeaders,
+          [HTTP_HEADERS.accept]: MIME_TYPES.any,
+          [HTTP_HEADERS.referer]: `${PROVIDERS.mangaOne.baseUrl}/manga/${titleId}/chapter/${chapterId}`,
+        },
+      }),
+      Result.andThen(parseChapterList),
+    );
+    if (Result.isFailure(pageResult)) return pageResult;
+    const { chapters, totalCount } = pageResult.value;
     let newCount = 0;
     for (const chapter of chapters) {
       if (seen.has(chapter.id)) continue;
@@ -157,41 +168,49 @@ const fetchChapters = async (titleId: number, chapterId: string): Promise<FeedIt
     }
     if (newCount === 0 || (totalCount > 0 && items.length >= totalCount)) break;
   }
-  return items.sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+  return Result.succeed(items.sort((a, b) => (a.date ?? '').localeCompare(b.date ?? '')));
 };
 
 export const mangaOneProvider = createProvider(PROVIDERS.mangaOne, async (identifier) => {
   const viewerUrl = `${PROVIDERS.mangaOne.baseUrl}/viewer/${encodeURIComponent(identifier)}`;
-  const html = await fetchText(viewerUrl, { headers: browserHeaders });
-  const metadata = mangaOnePageMetadataSchema.parse({
-    title: extractMetaContent(html, 'og:title') ?? extractMetaContent(html, 'twitter:title'),
-    description:
-      extractMetaContent(html, 'description') ?? extractMetaContent(html, 'og:description'),
-    canonical: extractCanonical(html) ?? extractMetaContent(html, 'og:url'),
-    image: extractMetaContent(html, 'og:image') ?? extractMetaContent(html, 'twitter:image'),
-    titleId: extractTitleId(html),
-  });
-  if (!metadata.titleId) throw new Error('MangaONE title id not found');
-  const itemUrl =
-    metadata.canonical ??
-    `${PROVIDERS.mangaOne.baseUrl}/manga/${metadata.titleId}/chapter/${encodeURIComponent(identifier)}`;
-  const items = await fetchChapters(metadata.titleId, identifier);
-  return {
-    title:
-      metadata.title?.replace(/\s+第.+$/, '') ??
-      fallbackFeedTitle(PROVIDERS.mangaOne.siteName, identifier),
-    link: itemUrl,
-    description: metadata.description ?? '',
-    items:
-      items.length > 0
-        ? items
-        : [
-            {
-              id: identifier,
-              title: metadata.title ?? `chapter ${identifier}`,
-              url: itemUrl,
-              ...(metadata.image ? { thumbnail: metadata.image } : {}),
-            },
-          ],
-  };
+  return Result.pipe(
+    fetchText(viewerUrl, { headers: browserHeaders }),
+    Result.andThen((html) =>
+      parseSchema(mangaOnePageMetadataSchema, {
+        title: extractMetaContent(html, 'og:title') ?? extractMetaContent(html, 'twitter:title'),
+        description:
+          extractMetaContent(html, 'description') ?? extractMetaContent(html, 'og:description'),
+        canonical: extractCanonical(html) ?? extractMetaContent(html, 'og:url'),
+        image: extractMetaContent(html, 'og:image') ?? extractMetaContent(html, 'twitter:image'),
+        titleId: extractTitleId(html),
+      }),
+    ),
+    Result.andThen((metadata) => {
+      if (!metadata.titleId) return Result.fail(new Error('MangaONE title id not found'));
+      const itemUrl =
+        metadata.canonical ??
+        `${PROVIDERS.mangaOne.baseUrl}/manga/${metadata.titleId}/chapter/${encodeURIComponent(identifier)}`;
+      return Result.pipe(
+        fetchChapters(metadata.titleId, identifier),
+        Result.map((items) => ({
+          title:
+            metadata.title?.replace(/\s+第.+$/, '') ??
+            fallbackFeedTitle(PROVIDERS.mangaOne.siteName, identifier),
+          link: itemUrl,
+          description: metadata.description ?? '',
+          items:
+            items.length > 0
+              ? items
+              : [
+                  {
+                    id: identifier,
+                    title: metadata.title ?? `chapter ${identifier}`,
+                    url: itemUrl,
+                    ...(metadata.image ? { thumbnail: metadata.image } : {}),
+                  },
+                ],
+        })),
+      );
+    }),
+  );
 });

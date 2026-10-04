@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import { USER_AGENT } from '../constants/http.ts';
-import { fetchBytes, fetchJson, fetchText } from '../lib/http.ts';
-import { Result, type ResultAsync } from '../lib/result.ts';
+import { fetchBytes, fetchJson, fetchText } from './http.ts';
+import { Result, type ResultAsync } from './result.ts';
 
 const url = 'https://example.com/resource';
 const schema = z.object({ ok: z.boolean() });

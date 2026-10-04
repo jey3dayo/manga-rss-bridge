@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { z } from 'zod';
 import { Result } from '../lib/result.ts';
-import { parseSchema } from '../schemas/parse.ts';
+import { parseSchema } from './parse.ts';
 
 describe('parseSchema', () => {
   afterEach(() => {

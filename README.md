@@ -65,7 +65,8 @@ TypeScript OPML generator suite, including the standalone Node.js 24.3+ (24.x) C
 Node 24.3 is the minimum because earlier releases emit type-stripping warnings
 and do not satisfy the CLI test contract. CI checks both 24.3.0 and 24.19.0.
 Neither suite requires Python. `pnpm check` typechecks the service, generator,
-and tests; `pnpm build` still emits only the service under `dist/`.
+and tests. Service tests live beside their implementation as `*.test.ts`;
+`pnpm build` excludes tests and fixtures and emits only the service under `dist/`.
 
 Use `mise run ci` for the full format, lint, typecheck, service test,
 OPML test, and build gate. Install dependencies first with

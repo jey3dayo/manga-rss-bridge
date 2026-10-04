@@ -9,5 +9,6 @@
     "tests/**/*.ts",
     ".apm/skills/manga-rss-bridge/scripts/*.mts",
     ".agents/skills/manga-rss-bridge/scripts/*.mts"
-  ]
+  ],
+  "exclude": []
 }

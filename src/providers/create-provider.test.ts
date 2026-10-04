@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { escapedRssFeedFixture } from '../fixtures/rss.ts';
 import { Result } from '../lib/result.ts';
-import { createProvider } from '../providers/create-provider.ts';
+import { createProvider } from './create-provider.ts';
 
 const metadata = { id: 'provider', siteName: 'Site' };
 

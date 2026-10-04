@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createApp } from '../app.ts';
-import { escapedRssFeedFixture } from '../fixtures/rss.ts';
-import { tryCatch } from '../lib/result.ts';
-import { listProviders } from '../providers/index.ts';
-import type { Provider } from '../types/feed.ts';
+import { createApp } from './app.ts';
+import { escapedRssFeedFixture } from './fixtures/rss.ts';
+import { tryCatch } from './lib/result.ts';
+import { listProviders } from './providers/index.ts';
+import type { Provider } from './types/feed.ts';
 
 const makeProvider = (id = 'fixture'): Provider => ({
   id,

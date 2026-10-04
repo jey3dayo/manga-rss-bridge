@@ -20,6 +20,7 @@ This file is the short repository-local workflow guide for agents.
 | Product scope, setup, usage, supported providers | [README.md](README.md) | User-facing overview, examples, commands, and policy |
 | Tool versions and scripts | [mise.toml](mise.toml) and [package.json](package.json) | Toolchain versions, mise task aliases, package manager, Node engine, scripts, and dependency contract |
 | Runtime constants | `src/constants/*.ts` | Shared literals such as headers, provider IDs, and stable defaults |
+| Service tests | `src/**/*.test.ts` | Co-locate tests with their implementation; keep shared provider contracts beside `src/providers/index.ts` |
 | Test fixtures | `src/fixtures/` | Reusable sample inputs; provider-specific data and helpers live under `src/fixtures/providers/` |
 | Runtime schemas | `src/schemas/*.ts` | Zod schemas for external provider responses and runtime boundaries |
 | Result boundary | `src/lib/result.ts` and `src/providers/create-provider.ts` | Provider errors should be returned as `Result`, not leaked as uncaught exceptions |
@@ -42,6 +43,7 @@ This file is the short repository-local workflow guide for agents.
 
 - Prefer TypeScript over Python for new OSS code in this repository.
 - Prefer `type` aliases for object shapes, unions, and contracts. Use `interface` only for declaration merging or external augmentation.
+- Keep service tests next to their implementation as `<module>.test.ts`; exclude tests and fixtures from the runtime build while including both in type checking.
 - Keep external provider response validation in Zod schemas under `src/schemas/*.ts`.
 - Derive runtime-boundary types from schemas with `z.infer` or `z.output`.
 - Provider implementations should return `Result<MangaFeed, Error>` through the provider contract.

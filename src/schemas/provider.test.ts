@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PROVIDERS } from '../constants/providers.ts';
-import { providerMetadataSchema } from '../schemas/provider.ts';
+import { providerMetadataSchema } from './provider.ts';
 
 describe('provider metadata schema', () => {
   it('validates all configured providers', () => {

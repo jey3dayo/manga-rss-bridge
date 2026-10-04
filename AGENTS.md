@@ -22,7 +22,8 @@ This file is the short repository-local workflow guide for agents.
 | Runtime constants | `src/constants/*.ts` | Shared literals such as headers, provider IDs, and stable defaults |
 | Test fixtures | `src/fixtures/*.ts` | Reusable sample inputs for tests and parser coverage |
 | Runtime schemas | `src/schemas/*.ts` | Zod schemas for external provider responses and runtime boundaries |
-| Result boundary | `src/lib/result.ts` and provider `fetchFeed` contracts | Provider errors should be returned as `Result`, not leaked as uncaught exceptions |
+| Result boundary | `src/lib/result.ts` and `src/providers/create-provider.ts` | Provider errors should be returned as `Result`, not leaked as uncaught exceptions |
+| HTTP routes and startup | `src/app.ts` and `src/server.ts` | Keep route handling testable without opening a listening socket |
 | RSS rendering | `src/lib/rss.ts` | XML escaping, RSS shape, guid, and pubDate formatting |
 | Provider registry | `src/providers/index.ts` | Public provider IDs and dispatch routing |
 | Generated artifacts | `dist/` | Build output only; do not edit directly |
@@ -55,7 +56,7 @@ This file is the short repository-local workflow guide for agents.
 When adding a provider:
 
 1. Add a schema file in `src/schemas/<provider>.ts` for the external JSON boundary, if the provider uses JSON.
-2. Add `src/providers/<provider>.ts` implementing `Provider`.
+2. Add `src/providers/<provider>.ts` using `createProvider` to keep retrieval, validation, and conversion failures inside the `Provider` Result boundary.
 3. Register it in `src/providers/index.ts`.
 4. Add README examples and policy notes if user-facing behavior changes.
 5. Add focused Vitest coverage for RSS rendering or provider parsing helpers. Prefer fixtures over live network tests.

@@ -1,79 +1,51 @@
-import { z } from 'zod';
 import { PROVIDERS } from '../constants/providers.ts';
 import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchJson, fetchText } from '../lib/http.ts';
-import { tryCatch } from '../lib/result.ts';
-import { ganganTitleSchema, type GanganTitle } from '../schemas/gangan-online.ts';
-import type { MangaFeed, Provider } from '../types/feed.ts';
+import {
+  ganganEmbeddedTitleSchema,
+  ganganNextDataSchema,
+  ganganTitleDataSchema,
+  type GanganNextData,
+  type GanganTitle,
+} from '../schemas/gangan-online.ts';
+import { createProvider } from './create-provider.ts';
 
-const nextDataSchema = z
-  .object({
-    buildId: z.string().optional(),
-    props: z.unknown().optional(),
-  })
-  .passthrough();
-
-const nextTitleDataSchema = z.object({
-  pageProps: z.object({
-    data: z.object({
-      default: ganganTitleSchema,
-    }),
-  }),
-});
-
-const extractNextData = (html: string): z.infer<typeof nextDataSchema> => {
+const extractNextData = (html: string): GanganNextData => {
   const match = /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s.exec(html);
   if (!match?.[1]) throw new Error('__NEXT_DATA__ not found');
-  return nextDataSchema.parse(JSON.parse(match[1]));
+  return ganganNextDataSchema.parse(JSON.parse(match[1]));
 };
-
-const embeddedTitleSchema = z.object({
-  props: z.object({
-    pageProps: z.object({
-      data: z.object({
-        default: ganganTitleSchema,
-      }),
-    }),
-  }),
-});
 
 const fetchTitle = async (titleId: string): Promise<GanganTitle> => {
   const pageUrl = `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}`;
   const nextData = extractNextData(await fetchText(pageUrl));
   if (nextData.buildId) {
     const dataUrl = `${PROVIDERS.ganganOnline.baseUrl}/_next/data/${nextData.buildId}/title/${encodeURIComponent(titleId)}.json`;
-    return (await fetchJson(dataUrl, nextTitleDataSchema)).pageProps.data.default;
+    return (await fetchJson(dataUrl, ganganTitleDataSchema)).pageProps.data.default;
   }
-  return embeddedTitleSchema.parse(nextData).props.pageProps.data.default;
+  return ganganEmbeddedTitleSchema.parse(nextData).props.pageProps.data.default;
 };
 
-export const ganganOnlineProvider: Provider = {
-  id: PROVIDERS.ganganOnline.id,
-  siteName: PROVIDERS.ganganOnline.siteName,
-  fetchFeed(titleId: string) {
-    return tryCatch(async (): Promise<MangaFeed> => {
-      const title = await fetchTitle(titleId);
-      const titleName =
-        title.titleName ?? fallbackFeedTitle(PROVIDERS.ganganOnline.siteName, titleId);
-      const description = title.description ?? '';
-      const link = `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}`;
-      const items = (title.chapters ?? [])
-        .filter((chapter) => chapter.id !== undefined)
-        .flatMap((chapter) => {
-          const chapterId = String(chapter.id).trim();
-          if (!chapterId) return [];
-          return {
-            id: chapterId,
-            title: chapter.mainText ?? `chapter ${chapterId}`,
-            url: `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}/chapter/${encodeURIComponent(chapterId)}`,
-          };
-        });
+export const ganganOnlineProvider = createProvider(PROVIDERS.ganganOnline, async (titleId) => {
+  const title = await fetchTitle(titleId);
+  const titleName = title.titleName ?? fallbackFeedTitle(PROVIDERS.ganganOnline.siteName, titleId);
+  const description = title.description ?? '';
+  const link = `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}`;
+  const items = (title.chapters ?? [])
+    .filter((chapter) => chapter.id !== undefined)
+    .flatMap((chapter) => {
+      const chapterId = String(chapter.id).trim();
+      if (!chapterId) return [];
       return {
-        title: titleName,
-        link,
-        description: [title.author, description].filter(Boolean).join('\n'),
-        items,
+        id: chapterId,
+        title: chapter.mainText ?? `chapter ${chapterId}`,
+        url: `${PROVIDERS.ganganOnline.baseUrl}/title/${encodeURIComponent(titleId)}/chapter/${encodeURIComponent(chapterId)}`,
       };
     });
-  },
-};
+  return {
+    title: titleName,
+    link,
+    description: [title.author, description].filter(Boolean).join('\n'),
+    items,
+  };
+});

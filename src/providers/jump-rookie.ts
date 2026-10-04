@@ -2,8 +2,8 @@ import { PROVIDERS } from '../constants/providers.ts';
 import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchText } from '../lib/http.ts';
 import { absoluteUrl, extractMetaContent, stripTags, uniqueByUrl } from '../lib/html.ts';
-import { tryCatch } from '../lib/result.ts';
-import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
+import type { FeedItem } from '../types/feed.ts';
+import { createProvider } from './create-provider.ts';
 
 const extractEpisodeBlocks = (html: string): string[] => {
   const starts = [
@@ -36,21 +36,15 @@ const parseItems = (html: string, baseUrl: string, seriesId: string): FeedItem[]
     }),
   );
 
-export const jumpRookieProvider: Provider = {
-  id: PROVIDERS.jumpRookie.id,
-  siteName: PROVIDERS.jumpRookie.siteName,
-  fetchFeed(seriesId: string) {
-    return tryCatch(async (): Promise<MangaFeed> => {
-      const link = `${PROVIDERS.jumpRookie.baseUrl}/series/${encodeURIComponent(seriesId)}`;
-      const html = await fetchText(link);
-      return {
-        title:
-          extractMetaContent(html, 'og:title') ??
-          fallbackFeedTitle(PROVIDERS.jumpRookie.siteName, seriesId),
-        link,
-        description: extractMetaContent(html, 'description') ?? '',
-        items: parseItems(html, link, seriesId),
-      };
-    });
-  },
-};
+export const jumpRookieProvider = createProvider(PROVIDERS.jumpRookie, async (seriesId) => {
+  const link = `${PROVIDERS.jumpRookie.baseUrl}/series/${encodeURIComponent(seriesId)}`;
+  const html = await fetchText(link);
+  return {
+    title:
+      extractMetaContent(html, 'og:title') ??
+      fallbackFeedTitle(PROVIDERS.jumpRookie.siteName, seriesId),
+    link,
+    description: extractMetaContent(html, 'description') ?? '',
+    items: parseItems(html, link, seriesId),
+  };
+});

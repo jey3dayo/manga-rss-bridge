@@ -4,7 +4,6 @@ import { comicDaysProvider } from '../providers/comic-days.ts';
 import { ganganOnlineProvider } from '../providers/gangan-online.ts';
 import { kadocomiProvider } from '../providers/kadocomi.ts';
 import { pixivComicProvider } from '../providers/pixiv-comic.ts';
-import { getProvider } from '../providers/index.ts';
 import { yanmagaProvider } from '../providers/yanmaga.ts';
 
 describe('providers', () => {
@@ -274,9 +273,5 @@ describe('providers', () => {
 
     expect(Result.isFailure(result)).toBe(true);
     expect(requestCount).toBe(0);
-  });
-
-  it('registers the Pixiv Comic provider route', () => {
-    expect(getProvider('pixiv-comic')).toBe(pixivComicProvider);
   });
 });

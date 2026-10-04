@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-const episodeIdSchema = z.union([z.number().int().positive(), z.string().regex(/^[1-9]\d*$/)]);
+const pixivIdSchema = z.union([z.number().int().positive(), z.string().regex(/^[1-9]\d*$/)]);
 
 const pixivEpisodeSchema = z.object({
-  id: episodeIdSchema,
+  id: pixivIdSchema,
   numbering_title: z.string().optional(),
   sub_title: z.string().optional(),
   read_start_at: z.number().int().positive().nullable().optional(),
@@ -13,7 +13,7 @@ const pixivEpisodeSchema = z.object({
 export const pixivComicWorkResponseSchema = z.object({
   data: z.object({
     official_work: z.object({
-      id: z.union([z.number().int().positive(), z.string().regex(/^[1-9]\d*$/)]),
+      id: pixivIdSchema,
       name: z.string().min(1),
       author: z.string().optional(),
     }),

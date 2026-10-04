@@ -8,8 +8,8 @@ import {
   stripTags,
   uniqueByUrl,
 } from '../lib/html.ts';
-import { tryCatch } from '../lib/result.ts';
-import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
+import type { FeedItem } from '../types/feed.ts';
+import { createProvider } from './create-provider.ts';
 
 const fragmentId = (value: string): string =>
   `episode-${value.replaceAll(/[^\p{L}\p{N}]+/gu, '-').replaceAll(/^-|-$/g, '')}`;
@@ -40,19 +40,13 @@ const parseItems = (html: string, link: string): FeedItem[] =>
     }),
   );
 
-export const gaugauProvider: Provider = {
-  id: PROVIDERS.gaugau.id,
-  siteName: PROVIDERS.gaugau.siteName,
-  fetchFeed(workId: string) {
-    return tryCatch(async (): Promise<MangaFeed> => {
-      const link = `${PROVIDERS.gaugau.baseUrl}/list/work/${encodeURIComponent(workId)}/episodes`;
-      const html = await fetchText(link);
-      return {
-        title: titleBeforeSeparator(html, PROVIDERS.gaugau.siteName, workId),
-        link,
-        description: extractMetaContent(html, 'description') ?? '',
-        items: parseItems(html, link),
-      };
-    });
-  },
-};
+export const gaugauProvider = createProvider(PROVIDERS.gaugau, async (workId) => {
+  const link = `${PROVIDERS.gaugau.baseUrl}/list/work/${encodeURIComponent(workId)}/episodes`;
+  const html = await fetchText(link);
+  return {
+    title: titleBeforeSeparator(html, PROVIDERS.gaugau.siteName, workId),
+    link,
+    description: extractMetaContent(html, 'description') ?? '',
+    items: parseItems(html, link),
+  };
+});

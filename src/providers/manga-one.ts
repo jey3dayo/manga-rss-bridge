@@ -3,9 +3,9 @@ import { PROVIDERS } from '../constants/providers.ts';
 import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchBytes, fetchText } from '../lib/http.ts';
 import { extractMetaContent } from '../lib/html.ts';
-import { tryCatch } from '../lib/result.ts';
 import { mangaOnePageMetadataSchema } from '../schemas/manga-one.ts';
-import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
+import type { FeedItem } from '../types/feed.ts';
+import { createProvider } from './create-provider.ts';
 
 const browserHeaders = {
   [HTTP_HEADERS.userAgent]: BROWSER_USER_AGENT,
@@ -160,44 +160,38 @@ const fetchChapters = async (titleId: number, chapterId: string): Promise<FeedIt
   return items.sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
 };
 
-export const mangaOneProvider: Provider = {
-  id: PROVIDERS.mangaOne.id,
-  siteName: PROVIDERS.mangaOne.siteName,
-  fetchFeed(identifier: string) {
-    return tryCatch(async (): Promise<MangaFeed> => {
-      const viewerUrl = `${PROVIDERS.mangaOne.baseUrl}/viewer/${encodeURIComponent(identifier)}`;
-      const html = await fetchText(viewerUrl, { headers: browserHeaders });
-      const metadata = mangaOnePageMetadataSchema.parse({
-        title: extractMetaContent(html, 'og:title') ?? extractMetaContent(html, 'twitter:title'),
-        description:
-          extractMetaContent(html, 'description') ?? extractMetaContent(html, 'og:description'),
-        canonical: extractCanonical(html) ?? extractMetaContent(html, 'og:url'),
-        image: extractMetaContent(html, 'og:image') ?? extractMetaContent(html, 'twitter:image'),
-        titleId: extractTitleId(html),
-      });
-      if (!metadata.titleId) throw new Error('MangaONE title id not found');
-      const itemUrl =
-        metadata.canonical ??
-        `${PROVIDERS.mangaOne.baseUrl}/manga/${metadata.titleId}/chapter/${encodeURIComponent(identifier)}`;
-      const items = await fetchChapters(metadata.titleId, identifier);
-      return {
-        title:
-          metadata.title?.replace(/\s+第.+$/, '') ??
-          fallbackFeedTitle(PROVIDERS.mangaOne.siteName, identifier),
-        link: itemUrl,
-        description: metadata.description ?? '',
-        items:
-          items.length > 0
-            ? items
-            : [
-                {
-                  id: identifier,
-                  title: metadata.title ?? `chapter ${identifier}`,
-                  url: itemUrl,
-                  ...(metadata.image ? { thumbnail: metadata.image } : {}),
-                },
-              ],
-      };
-    });
-  },
-};
+export const mangaOneProvider = createProvider(PROVIDERS.mangaOne, async (identifier) => {
+  const viewerUrl = `${PROVIDERS.mangaOne.baseUrl}/viewer/${encodeURIComponent(identifier)}`;
+  const html = await fetchText(viewerUrl, { headers: browserHeaders });
+  const metadata = mangaOnePageMetadataSchema.parse({
+    title: extractMetaContent(html, 'og:title') ?? extractMetaContent(html, 'twitter:title'),
+    description:
+      extractMetaContent(html, 'description') ?? extractMetaContent(html, 'og:description'),
+    canonical: extractCanonical(html) ?? extractMetaContent(html, 'og:url'),
+    image: extractMetaContent(html, 'og:image') ?? extractMetaContent(html, 'twitter:image'),
+    titleId: extractTitleId(html),
+  });
+  if (!metadata.titleId) throw new Error('MangaONE title id not found');
+  const itemUrl =
+    metadata.canonical ??
+    `${PROVIDERS.mangaOne.baseUrl}/manga/${metadata.titleId}/chapter/${encodeURIComponent(identifier)}`;
+  const items = await fetchChapters(metadata.titleId, identifier);
+  return {
+    title:
+      metadata.title?.replace(/\s+第.+$/, '') ??
+      fallbackFeedTitle(PROVIDERS.mangaOne.siteName, identifier),
+    link: itemUrl,
+    description: metadata.description ?? '',
+    items:
+      items.length > 0
+        ? items
+        : [
+            {
+              id: identifier,
+              title: metadata.title ?? `chapter ${identifier}`,
+              url: itemUrl,
+              ...(metadata.image ? { thumbnail: metadata.image } : {}),
+            },
+          ],
+  };
+});

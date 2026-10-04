@@ -6,8 +6,8 @@ import {
   stripTags,
   uniqueByUrl,
 } from '../lib/html.ts';
-import { tryCatch } from '../lib/result.ts';
-import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
+import type { FeedItem, Provider } from '../types/feed.ts';
+import { createProvider } from './create-provider.ts';
 
 type HtmlListProviderOptions = {
   id: string;
@@ -69,20 +69,15 @@ const parseItems = (html: string, baseUrl: string, options: HtmlListProviderOpti
     }),
   );
 
-export const createHtmlListProvider = (options: HtmlListProviderOptions): Provider => ({
-  id: options.id,
-  siteName: options.siteName,
-  fetchFeed(identifier: string) {
-    return tryCatch(async (): Promise<MangaFeed> => {
-      const link = options.url(identifier);
-      const html = await fetchText(link, options.init);
-      const description = extractMetaContent(html, 'description') ?? '';
-      return {
-        title: options.feedTitle(html, identifier),
-        link,
-        description,
-        items: parseItems(html, link, options),
-      };
-    });
-  },
-});
+export const createHtmlListProvider = (options: HtmlListProviderOptions): Provider =>
+  createProvider(options, async (identifier) => {
+    const link = options.url(identifier);
+    const html = await fetchText(link, options.init);
+    const description = extractMetaContent(html, 'description') ?? '';
+    return {
+      title: options.feedTitle(html, identifier),
+      link,
+      description,
+      items: parseItems(html, link, options),
+    };
+  });

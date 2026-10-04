@@ -8,8 +8,8 @@ import {
   stripTags,
   uniqueByUrl,
 } from '../lib/html.ts';
-import { tryCatch } from '../lib/result.ts';
-import type { FeedItem, MangaFeed, Provider } from '../types/feed.ts';
+import type { FeedItem } from '../types/feed.ts';
+import { createProvider } from './create-provider.ts';
 
 const attrValue = (block: string, name: string): string | undefined =>
   new RegExp(`${name}=["']([^"']+)["']`, 'i').exec(block)?.[1];
@@ -43,26 +43,20 @@ const parseEpisodeItems = (html: string, baseUrl: string): FeedItem[] =>
     }),
   ).sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
 
-export const yanmagaProvider: Provider = {
-  id: PROVIDERS.yanmaga.id,
-  siteName: PROVIDERS.yanmaga.siteName,
-  fetchFeed(identifier: string) {
-    return tryCatch(async (): Promise<MangaFeed> => {
-      const slug = identifier;
-      const link = `${PROVIDERS.yanmaga.baseUrl}/comics/${encodeURIComponent(slug)}?sort=older`;
-      const html = await fetchText(link);
-      return {
-        title:
-          extractMetaContent(html, 'og:title')
-            ?.replace(/『|』|【無料公開中】|ヤンマガWeb/g, '')
-            .replace(/\s*\|\s*$/, '')
-            .trim() ??
-          extractTitle(html) ??
-          identifier,
-        link,
-        description: extractMetaContent(html, 'description') ?? '',
-        items: parseEpisodeItems(html, link),
-      };
-    });
-  },
-};
+export const yanmagaProvider = createProvider(PROVIDERS.yanmaga, async (identifier) => {
+  const slug = identifier;
+  const link = `${PROVIDERS.yanmaga.baseUrl}/comics/${encodeURIComponent(slug)}?sort=older`;
+  const html = await fetchText(link);
+  return {
+    title:
+      extractMetaContent(html, 'og:title')
+        ?.replace(/『|』|【無料公開中】|ヤンマガWeb/g, '')
+        .replace(/\s*\|\s*$/, '')
+        .trim() ??
+      extractTitle(html) ??
+      identifier,
+    link,
+    description: extractMetaContent(html, 'description') ?? '',
+    items: parseEpisodeItems(html, link),
+  };
+});

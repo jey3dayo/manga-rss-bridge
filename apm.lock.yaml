@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-10-03T19:15:13.755683+00:00'
+generated_at: '2026-10-11T16:44:48.630692+00:00'
 apm_version: 0.31.0
 dependencies:
 - repo_url: _local/manga-rss-bridge
@@ -15,7 +15,7 @@ dependencies:
   deployed_file_hashes:
     .agents/skills/manga-rss-bridge/SKILL.md: sha256:2f919d8829fb0e9b73d44c97b6732328694b7275838651d858aab93e89d2864e
     .agents/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
-    .agents/skills/manga-rss-bridge/references/usage.md: sha256:dc339cadc8719fa0fc33b5238a96e30b863bec71b8f949eb4e0205086cac249c
+    .agents/skills/manga-rss-bridge/references/usage.md: sha256:0fb291ba86fd7639ce3fc9637766975ebb3122428619972f98b2e433d75e7f8e
     .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts: sha256:02ade2fbc027b78eee46cf4fc868e77a10e2a3b1fa4fcc2d1260a78fae3dafd0
   source: local
   local_path: ./.apm/skills/manga-rss-bridge
@@ -59,7 +59,7 @@ deployments:
   - ./.apm/skills/manga-rss-bridge
   - .
   active_owner: ./.apm/skills/manga-rss-bridge
-  content_hash: sha256:dc339cadc8719fa0fc33b5238a96e30b863bec71b8f949eb4e0205086cac249c
+  content_hash: sha256:0fb291ba86fd7639ce3fc9637766975ebb3122428619972f98b2e433d75e7f8e
 - kind: project-relative
   target: codex
   value: .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts
@@ -79,5 +79,5 @@ local_deployed_files:
 local_deployed_file_hashes:
   .agents/skills/manga-rss-bridge/SKILL.md: sha256:2f919d8829fb0e9b73d44c97b6732328694b7275838651d858aab93e89d2864e
   .agents/skills/manga-rss-bridge/agents/openai.yaml: sha256:3eea5be52a31f87486d5079f543c9aba0fbae0c5451b9abc7ed9eec9a3985059
-  .agents/skills/manga-rss-bridge/references/usage.md: sha256:dc339cadc8719fa0fc33b5238a96e30b863bec71b8f949eb4e0205086cac249c
+  .agents/skills/manga-rss-bridge/references/usage.md: sha256:0fb291ba86fd7639ce3fc9637766975ebb3122428619972f98b2e433d75e7f8e
   .agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts: sha256:02ade2fbc027b78eee46cf4fc868e77a10e2a3b1fa4fcc2d1260a78fae3dafd0

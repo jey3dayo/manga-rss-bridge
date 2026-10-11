@@ -130,8 +130,10 @@ Check `node --version` first. The script uses only Node built-ins, so a copied
 skill does not need `pnpm install`, a build, or a global TypeScript runner.
 The `.mts` extension keeps it usable in both ESM and CommonJS projects.
 Run it from the skill directory, or replace the script path with its full path.
-In this repository, that path is
-`.apm/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts`.
+In a source checkout of `manga-rss-bridge`, the path is
+`.apm/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts`. In a repository
+where APM deployed this skill, use
+`.agents/skills/manga-rss-bridge/scripts/generate_freshrss_opml.mts`.
 Node availability on the homelab/Pi is not assumed: generate the file on your
 Node-equipped workstation and then copy it to FreshRSS as shown below.
 

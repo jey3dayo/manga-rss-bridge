@@ -21,26 +21,31 @@ import type { FeedItem } from '../types/feed.ts';
 import { createProvider } from './create-provider.ts';
 
 const pushPattern = /self\.__next_f\.push\(\[1,\s*("(?:[^"\\]|\\.)*")\]/g;
+const flightRowPattern = /^[0-9a-f]+:/i;
 
 type DrecomiSeriesState = {
   detail?: DrecomiPlusSeriesDetail | undefined;
   episodes: DrecomiPlusEpisode[];
 };
 
-const decodeFlightEntries = (html: string): string[] => {
-  const entries: string[] = [];
+const decodePushStream = (html: string): string => {
+  let stream = '';
   for (const match of html.matchAll(pushPattern)) {
     const literal = match[1];
     if (literal === undefined) continue;
-    let decoded: unknown;
     try {
-      decoded = JSON.parse(literal);
-    } catch {
-      continue;
-    }
-    if (typeof decoded !== 'string') continue;
-    if (/^\d+:/.test(decoded)) entries.push(decoded);
-    else if (entries.length > 0) entries[entries.length - 1] += decoded;
+      const decoded = JSON.parse(literal);
+      if (typeof decoded === 'string') stream += decoded;
+    } catch {}
+  }
+  return stream;
+};
+
+const decodeFlightEntries = (html: string): string[] => {
+  const entries: string[] = [];
+  for (const row of decodePushStream(html).split('\n')) {
+    if (flightRowPattern.test(row) || entries.length === 0) entries.push(row);
+    else entries[entries.length - 1] += row;
   }
   return entries;
 };

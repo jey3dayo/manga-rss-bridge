@@ -116,6 +116,11 @@ export const drecomiDehydratedHtml = (queries: unknown[]): string => {
   return `<html><head><title>ドリコミ＋</title></head><body>${flightScripts([chunk, continuation])}</body></html>`;
 };
 
+export const drecomiRowBatchHtml = (rows: string[]): string =>
+  `<html><head><title>ドリコミ＋</title></head><body><script>self.__next_f.push([1,${JSON.stringify(
+    rows.join('\n'),
+  )}])</script></body></html>`;
+
 export const drecomiPlusFixture: ProviderFixture = {
   id: 'drecomi-plus',
   identifier: 'CD00035',

@@ -8,6 +8,8 @@ import {
   drecomiPickupQuery,
   drecomiSeriesDetail,
   drecomiVolumesQuery,
+  flightEntryPayload,
+  drecomiRowBatchHtml,
 } from '../fixtures/providers/drecomi-plus.ts';
 import { failedFeed, mockResponses, successfulFeed } from '../fixtures/providers/test-helpers.ts';
 
@@ -84,6 +86,36 @@ describe('drecomi-plus response branches', () => {
     const feed = await successfulFeed('drecomi-plus', 'CD00035');
 
     expect(feed.title).toBe(drecomiSeriesDetail.name);
+    expect(feed.items).toHaveLength(3);
+  });
+
+  it('parses a row whose id contains hex digits', async () => {
+    const row = flightEntryPayload('2f', [
+      '$',
+      '$L18',
+      null,
+      { state: { mutations: [], queries: [drecomiDetailQuery, drecomiEpisodesQuery] } },
+    ]);
+    mockResponses({ [pageUrl]: drecomiRowBatchHtml([row]) });
+
+    const feed = await successfulFeed('drecomi-plus', 'CD00035');
+
+    expect(feed.title).toBe(drecomiSeriesDetail.name);
+    expect(feed.items).toHaveLength(3);
+  });
+
+  it('parses multiple newline-separated rows in a single push payload', async () => {
+    const irrelevant = flightEntryPayload('18', ['$', 'span', null, { children: '無関係な行' }]);
+    const episodes = flightEntryPayload('19', [
+      '$',
+      '$L18',
+      null,
+      { state: { mutations: [], queries: [drecomiEpisodesQuery] } },
+    ]);
+    mockResponses({ [pageUrl]: drecomiRowBatchHtml([irrelevant, episodes]) });
+
+    const feed = await successfulFeed('drecomi-plus', 'CD00035');
+
     expect(feed.items).toHaveLength(3);
   });
 

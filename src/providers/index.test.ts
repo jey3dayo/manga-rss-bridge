@@ -42,11 +42,15 @@ describe('registered provider contracts', () => {
     for (const [input, init] of fetchMock.mock.calls) {
       const headers = new Headers(init?.headers);
       if (fixture.id === 'comic-days') expect(headers.get('accept')).toBe(MIME_TYPES.rssXmlList);
-      if (['firecross', 'manga-one', 'pixiv-comic'].includes(fixture.id)) {
+      if (['drecomi-plus', 'firecross', 'manga-one', 'pixiv-comic'].includes(fixture.id)) {
         expect(headers.get('user-agent')).toBe(BROWSER_USER_AGENT);
       }
       if (fixture.id === 'firecross') {
         expect(headers.get('referer')).toBe('https://firecross.jp/');
+        expect(headers.get('accept-language')).toContain('ja');
+      }
+      if (fixture.id === 'drecomi-plus') {
+        expect(headers.get('referer')).toBe('https://drecomi-plus.jp/');
         expect(headers.get('accept-language')).toContain('ja');
       }
       if (fixture.id === 'manga-one' && String(input).includes('/api/client?')) {

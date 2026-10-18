@@ -1,4 +1,5 @@
 import { comicDaysFixture } from './comic-days.ts';
+import { drecomiPlusFixture } from './drecomi-plus.ts';
 import { firecrossFixture } from './firecross.ts';
 import { ganganOnlineFixture } from './gangan-online.ts';
 import { gaugauFixture } from './gaugau.ts';
@@ -13,6 +14,7 @@ import { yanmagaFixture } from './yanmaga.ts';
 
 export const providerFixtures: ProviderFixture[] = [
   comicDaysFixture,
+  drecomiPlusFixture,
   firecrossFixture,
   ganganOnlineFixture,
   gaugauFixture,

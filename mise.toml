@@ -7,6 +7,10 @@ _.path = ["./node_modules/.bin"]
 
 [tools]
 node = "24"
+gh-actions-lock = { version = "0.4.0", bin = "gh-actions-lock" }
+
+[tool_alias]
+gh-actions-lock = "github:github/gh-actions-lock"
 
 [tasks.format]
 description = "Format all files"
@@ -74,6 +78,17 @@ run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise wh
 description = "Run the development server"
 run = "pnpm run dev"
 run_windows = 'C:\Progra~1\PowerShell\7\pwsh.exe -NoProfile -Command "& (mise which node) --watch src/server.ts"'
+
+[tasks."actions-lock:generate"]
+description = "Generate and verify .github/workflows/actions.lock"
+run = [
+  "gh-actions-lock --migrate-local-actions --no-interactive",
+  "gh-actions-lock --verify",
+]
+
+[tasks."actions-lock:verify"]
+description = "Verify actions.lock covers every workflow"
+run = "gh-actions-lock --verify-local"
 
 [tasks.ci]
 description = "Full aggregate gate"

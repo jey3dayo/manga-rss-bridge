@@ -203,29 +203,28 @@ describe('provider Result flow', () => {
       pendingBody: { data: { episodes: [] } },
     },
     { failedUrl: pixivEpisodesUrl, pendingUrl: pixivWorkUrl, pendingBody: pixivWork },
-  ])('returns a failure from $failedUrl while the other request is pending', async ({
-    failedUrl,
-    pendingUrl,
-    pendingBody,
-  }) => {
-    const failure = new Error('metadata request failed');
-    const pending = Promise.withResolvers<Response>();
-    const fetchMock = vi.fn<typeof fetch>(async (input) => {
-      if (String(input) === failedUrl) throw failure;
-      if (String(input) === pendingUrl) return pending.promise;
-      throw new Error(`Unexpected request: ${String(input)}`);
-    });
-    vi.stubGlobal('fetch', fetchMock);
+  ])(
+    'returns a failure from $failedUrl while the other request is pending',
+    async ({ failedUrl, pendingUrl, pendingBody }) => {
+      const failure = new Error('metadata request failed');
+      const pending = Promise.withResolvers<Response>();
+      const fetchMock = vi.fn<typeof fetch>(async (input) => {
+        if (String(input) === failedUrl) throw failure;
+        if (String(input) === pendingUrl) return pending.promise;
+        throw new Error(`Unexpected request: ${String(input)}`);
+      });
+      vi.stubGlobal('fetch', fetchMock);
 
-    try {
-      const result = await pixivComicProvider.fetchFeed('42');
+      try {
+        const result = await pixivComicProvider.fetchFeed('42');
 
-      expect(Result.unwrapError(result)).toBe(failure);
-      expect(fetchMock.mock.calls.map(([input]) => String(input)).sort()).toEqual(
-        [failedUrl, pendingUrl].sort(),
-      );
-    } finally {
-      pending.resolve(new Response(JSON.stringify(pendingBody)));
-    }
-  });
+        expect(Result.unwrapError(result)).toBe(failure);
+        expect(fetchMock.mock.calls.map(([input]) => String(input)).sort()).toEqual(
+          [failedUrl, pendingUrl].sort(),
+        );
+      } finally {
+        pending.resolve(new Response(JSON.stringify(pendingBody)));
+      }
+    },
+  );
 });

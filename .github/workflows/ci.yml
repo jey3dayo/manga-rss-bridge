@@ -29,13 +29,13 @@ jobs:
         uses: jdx/mise-action@v5.2.4
         with:
           version: "2026.10.1"
-          install_args: "node@${{ matrix.node }} pnpm@11.8.0"
+          install_args: "node@${{ matrix.node }} pnpm@12.16.1"
 
       - name: Verify toolchain
         run: |
           mise --version
           test "$(mise exec -- node --version)" = "v$MISE_NODE_VERSION"
-          test "$(mise exec -- pnpm --version)" = "11.8.0"
+          test "$(mise exec -- pnpm --version)" = "12.16.1"
 
       - name: Install gh-actions-lock
         run: mise install gh-actions-lock

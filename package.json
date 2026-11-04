@@ -28,21 +28,21 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@hono/node-server": "^2.0.5",
-    "@praha/byethrow": "^0.12.0",
-    "hono": "^4.12.26",
-    "zod": "^4.4.3"
+    "@hono/node-server": "2.1.5",
+    "@praha/byethrow": "^0.13.0",
+    "hono": "4.13.14",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.0",
-    "@types/node": "^26.0.0",
-    "markdownlint-cli2": "^0.22.1",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "@biomejs/biome": "2.6.3",
+    "@types/node": "26.6.5",
+    "markdownlint-cli2": "^0.24.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.12"
   },
   "engines": {
     "node": ">=24.3.0 <25",
-    "pnpm": "11.8.0"
+    "pnpm": "12.16.1"
   },
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "pnpm@12.16.1"
 }

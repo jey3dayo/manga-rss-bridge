@@ -61,27 +61,27 @@ describe('MangaONE metadata and protobuf pagination', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it.each([
-    '{"title_id":42}',
-    '{\\"title_id\\":42}',
-  ])('can build a fallback from an embedded title id: %s', async (html) => {
-    mockResponses({
-      'https://manga-one.com/viewer/chapter%2F9': html,
-      [mangaOneApiUrl(1)]: mangaOneChapterList([]),
-    });
-    expect(await successfulFeed('manga-one', 'chapter/9')).toEqual({
-      title: 'マンガワン chapter/9',
-      description: '',
-      link: 'https://manga-one.com/manga/42/chapter/chapter%2F9',
-      items: [
-        {
-          id: 'chapter/9',
-          title: 'chapter chapter/9',
-          url: 'https://manga-one.com/manga/42/chapter/chapter%2F9',
-        },
-      ],
-    });
-  });
+  it.each(['{"title_id":42}', '{\\"title_id\\":42}'])(
+    'can build a fallback from an embedded title id: %s',
+    async (html) => {
+      mockResponses({
+        'https://manga-one.com/viewer/chapter%2F9': html,
+        [mangaOneApiUrl(1)]: mangaOneChapterList([]),
+      });
+      expect(await successfulFeed('manga-one', 'chapter/9')).toEqual({
+        title: 'マンガワン chapter/9',
+        description: '',
+        link: 'https://manga-one.com/manga/42/chapter/chapter%2F9',
+        items: [
+          {
+            id: 'chapter/9',
+            title: 'chapter chapter/9',
+            url: 'https://manga-one.com/manga/42/chapter/chapter%2F9',
+          },
+        ],
+      });
+    },
+  );
 
   it('fails before requesting chapters when the title id is absent', async () => {
     const fetchMock = mockResponses({

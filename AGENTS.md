@@ -14,21 +14,21 @@ This file is the short repository-local workflow guide for agents.
 
 ## Source Of Truth
 
-| Target | Source of truth | Use |
-| --- | --- | --- |
-| Agent runtime entry, workflow, and source routing | [AGENTS.md](AGENTS.md) | Repository-local workflow, quality gates, and source ownership |
-| Product scope, setup, usage, supported providers | [README.md](README.md) | User-facing overview, examples, commands, and policy |
-| Tool versions and scripts | [mise.toml](mise.toml) and [package.json](package.json) | Toolchain versions, mise task aliases, package manager, Node engine, scripts, and dependency contract |
-| Runtime constants | `src/constants/*.ts` | Shared literals such as headers, provider IDs, and stable defaults |
-| Service tests | `src/**/*.test.ts` | Co-locate tests with their implementation; keep shared provider contracts beside `src/providers/index.ts` |
-| Test fixtures | `src/fixtures/` | Reusable sample inputs; provider-specific data and helpers live under `src/fixtures/providers/` |
-| Runtime schemas | `src/schemas/*.ts` | Zod schemas for external provider responses and runtime boundaries |
-| Result boundary | `src/lib/result.ts` and `src/providers/create-provider.ts` | Provider errors should be returned as `Result`, not leaked as uncaught exceptions |
-| HTTP routes and startup | `src/app.ts` and `src/server.ts` | Keep route handling testable without opening a listening socket |
-| RSS rendering | `src/lib/rss.ts` | XML escaping, RSS shape, guid, and pubDate formatting |
-| Provider registry | `src/providers/index.ts` | Public provider IDs and dispatch routing |
-| Build entry point | `scripts/build.mts` | Clean only this project’s `dist/` before invoking TypeScript; shared by pnpm and mise |
-| Generated artifacts | `dist/` | Build output only; do not edit directly |
+| Target                                            | Source of truth                                            | Use                                                                                                       |
+| ------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Agent runtime entry, workflow, and source routing | [AGENTS.md](AGENTS.md)                                     | Repository-local workflow, quality gates, and source ownership                                            |
+| Product scope, setup, usage, supported providers  | [README.md](README.md)                                     | User-facing overview, examples, commands, and policy                                                      |
+| Tool versions and scripts                         | [mise.toml](mise.toml) and [package.json](package.json)    | Toolchain versions, mise task aliases, package manager, Node engine, scripts, and dependency contract     |
+| Runtime constants                                 | `src/constants/*.ts`                                       | Shared literals such as headers, provider IDs, and stable defaults                                        |
+| Service tests                                     | `src/**/*.test.ts`                                         | Co-locate tests with their implementation; keep shared provider contracts beside `src/providers/index.ts` |
+| Test fixtures                                     | `src/fixtures/`                                            | Reusable sample inputs; provider-specific data and helpers live under `src/fixtures/providers/`           |
+| Runtime schemas                                   | `src/schemas/*.ts`                                         | Zod schemas for external provider responses and runtime boundaries                                        |
+| Result boundary                                   | `src/lib/result.ts` and `src/providers/create-provider.ts` | Provider errors should be returned as `Result`, not leaked as uncaught exceptions                         |
+| HTTP routes and startup                           | `src/app.ts` and `src/server.ts`                           | Keep route handling testable without opening a listening socket                                           |
+| RSS rendering                                     | `src/lib/rss.ts`                                           | XML escaping, RSS shape, guid, and pubDate formatting                                                     |
+| Provider registry                                 | `src/providers/index.ts`                                   | Public provider IDs and dispatch routing                                                                  |
+| Build entry point                                 | `scripts/build.mts`                                        | Clean only this project’s `dist/` before invoking TypeScript; shared by pnpm and mise                     |
+| Generated artifacts                               | `dist/`                                                    | Build output only; do not edit directly                                                                   |
 
 ## Quality Gates
 

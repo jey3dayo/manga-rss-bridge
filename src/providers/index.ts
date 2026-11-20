@@ -1,5 +1,6 @@
 import type { Provider } from '../types/feed.ts';
 import { comicDaysProvider } from './comic-days.ts';
+import { coronaExProvider } from './corona-ex.ts';
 import { drecomiPlusProvider } from './drecomi-plus.ts';
 import { firecrossProvider } from './firecross.ts';
 import { gaugauProvider } from './gaugau.ts';
@@ -14,6 +15,7 @@ import { yanmagaProvider } from './yanmaga.ts';
 
 const providers = new Map<string, Provider>([
   [comicDaysProvider.id, comicDaysProvider],
+  [coronaExProvider.id, coronaExProvider],
   [drecomiPlusProvider.id, drecomiPlusProvider],
   [firecrossProvider.id, firecrossProvider],
   [gaugauProvider.id, gaugauProvider],

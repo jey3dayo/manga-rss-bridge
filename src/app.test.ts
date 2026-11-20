@@ -46,6 +46,7 @@ describe('app routes', () => {
       name: 'manga-rss-bridge',
       providers: [
         'comic-days',
+        'corona-ex',
         'drecomi-plus',
         'firecross',
         'gaugau',

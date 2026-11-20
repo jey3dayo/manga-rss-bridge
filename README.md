@@ -20,6 +20,7 @@ self-hosted use.
 - ハヤコミ: `/hayacomic/<series-id>.xml`
 - マンガボックス: `/mangabox/<reader-id>.xml`
 - pixivコミック: `/pixiv-comic/<work-id>.xml`
+- コロナEX: `/corona-ex/<comic-id>.xml`
 
 Examples:
 
@@ -36,11 +37,14 @@ http://localhost:8080/jump-rookie/zGZPbQ9GPgM.xml
 http://localhost:8080/hayacomic/a947a3d0ec0a1.xml
 http://localhost:8080/mangabox/251785.xml
 http://localhost:8080/pixiv-comic/8789.xml
+http://localhost:8080/corona-ex/20000000054623.xml
 ```
 
 The ドリコミ＋ provider reads publicly embedded series/episode listing metadata from the series page only. It links to the official episode pages and does not fetch episode text, paid content, or login-required data; the site may change its Next.js payload shape.
 
 The Pixiv Comic provider reads publicly exposed work and episode metadata only. It links to the official viewer and does not fetch episode text, images, or login-required preview data; Pixiv may change its undocumented web API.
+
+The コロナEX provider reads the publicly embedded `__NEXT_DATA__` payload of the comic page and emits a single item for the latest episode, because the site's full episode list is only available through its authenticated web API. A new item appears when the latest episode changes; if two episodes are published between two reader polls, the earlier one is not emitted. It links to the official episode page and does not fetch episode text, images, paid content, or login-required data. If the page payload, the comic metadata, or the latest episode cannot be parsed, the provider fails the feed request instead of returning an empty feed; the site may change its Next.js payload shape.
 
 ## Development
 

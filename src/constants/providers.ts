@@ -6,6 +6,11 @@ export const PROVIDERS = {
     siteName: 'コミックDAYS',
     baseUrl: 'https://comic-days.com',
   },
+  coronaEx: {
+    id: 'corona-ex',
+    siteName: 'コロナEX',
+    baseUrl: 'https://to-corona-ex.com',
+  },
   drecomiPlus: {
     id: 'drecomi-plus',
     siteName: 'ドリコミ＋',

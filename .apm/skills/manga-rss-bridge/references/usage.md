@@ -31,6 +31,7 @@ http://localhost:8080/jump-rookie/zGZPbQ9GPgM.xml
 http://localhost:8080/hayacomic/a947a3d0ec0a1.xml
 http://localhost:8080/mangabox/251785.xml
 http://localhost:8080/pixiv-comic/8789.xml
+http://localhost:8080/corona-ex/20000000054623.xml
 ```
 
 ## Docker
@@ -89,6 +90,7 @@ Provider notes:
 - Gangan ONLINE: title ID comes from `https://www.ganganonline.com/title/<title-id>`.
 - ヤンマガWeb: slug comes from `https://yanmaga.jp/comics/<slug>`.
 - Pixivコミック: work ID comes from `https://comic.pixiv.net/works/<work-id>`. The provider uses only the publicly exposed work/episode metadata APIs, does not fetch episode content or images, and does not use login-required preview APIs. The site's internal API may change.
+- コロナEX: comic ID comes from `https://to-corona-ex.com/comics/<comic-id>`. The provider reads only the publicly embedded page payload and emits the latest episode as a single feed item, because the full episode list requires the site's authenticated web API. Unparseable pages fail the feed request instead of returning an empty feed. For OPML generation, pass the comic ID as `--slug` with `--provider corona-ex`.
 
 Check service reachability:
 

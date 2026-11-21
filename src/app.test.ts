@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp } from './app.ts';
 import { escapedRssFeedFixture } from './fixtures/rss.ts';
+import { HttpStatusError } from './lib/http.ts';
 import { tryCatch } from './lib/result.ts';
 import { listProviders } from './providers/index.ts';
 import type { Provider } from './types/feed.ts';
@@ -126,6 +127,27 @@ describe('app routes', () => {
     expect(response.status).toBe(502);
     expect(response.headers.get('content-type')).toBe('text/plain; charset=UTF-8');
     expect(await response.text()).toBe('feed fetch failed\n');
+    expect(log).toHaveBeenCalledExactlyOnceWith('feed_error', {
+      provider: 'fixture',
+      identifier: 'work',
+      error,
+    });
+  });
+
+  it('returns 404 when the provider failure is an upstream 404', async () => {
+    const provider = makeProvider();
+    const error = new HttpStatusError('https://example.com/work', 404);
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(provider.fetchFeed).mockImplementation(() =>
+      tryCatch(async () => {
+        throw error;
+      }),
+    );
+
+    const response = await createApp([provider]).request('/fixture/work.xml');
+
+    expect(response.status).toBe(404);
+    expect(await response.text()).toBe('not found\n');
     expect(log).toHaveBeenCalledExactlyOnceWith('feed_error', {
       provider: 'fixture',
       identifier: 'work',

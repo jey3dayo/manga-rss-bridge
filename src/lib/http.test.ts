@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import { USER_AGENT } from '../constants/http.ts';
-import { fetchBytes, fetchJson, fetchText } from './http.ts';
+import { fetchBytes, fetchJson, fetchText, HttpStatusError } from './http.ts';
 import { Result, type ResultAsync } from './result.ts';
 
 const url = 'https://example.com/resource';
@@ -81,9 +81,11 @@ describe('http helpers', () => {
       const response = new Response('not a successful body', { status: 503 });
       vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(response));
 
-      expect(await transport.read(url, { method: 'POST' })).toEqual(
-        Result.fail(new Error(`GET ${url} failed: 503`)),
-      );
+      const result = await transport.read(url, { method: 'POST' });
+      expect(result).toEqual(Result.fail(new HttpStatusError(url, 503)));
+      const error = Result.unwrapError(result);
+      expect(error).toBeInstanceOf(HttpStatusError);
+      expect(error).toMatchObject({ status: 503 });
       expect(response.bodyUsed).toBe(false);
     });
 

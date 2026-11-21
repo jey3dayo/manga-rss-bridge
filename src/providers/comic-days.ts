@@ -1,5 +1,6 @@
 import { HTTP_HEADERS, MIME_TYPES } from '../constants/http.ts';
 import { PROVIDERS } from '../constants/providers.ts';
+import { requireFeedItems } from '../lib/feed.ts';
 import { normalizeSiteWrappedTitle } from '../lib/feed-title.ts';
 import { fetchText } from '../lib/http.ts';
 import { decodeHtml } from '../lib/html.ts';
@@ -75,5 +76,6 @@ export const comicDaysProvider = createProvider(PROVIDERS.comicDays, async (seri
       description: extractTag(xml, 'description') ?? '',
       items: extractItems(xml),
     })),
+    Result.andThen((feed) => requireFeedItems(PROVIDERS.comicDays.id, feed)),
   ),
 );

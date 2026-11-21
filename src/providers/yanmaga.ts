@@ -1,4 +1,5 @@
 import { PROVIDERS } from '../constants/providers.ts';
+import { requireFeedItems } from '../lib/feed.ts';
 import { fetchText } from '../lib/http.ts';
 import {
   absoluteUrl,
@@ -69,5 +70,6 @@ export const yanmagaProvider = createProvider(PROVIDERS.yanmaga, async (identifi
       description: extractMetaContent(html, 'description') ?? '',
       items,
     })),
+    Result.andThen((feed) => requireFeedItems(PROVIDERS.yanmaga.id, feed)),
   ),
 );

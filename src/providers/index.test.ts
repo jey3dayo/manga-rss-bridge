@@ -72,19 +72,14 @@ describe('registered provider contracts', () => {
     expect(await failedFeed(fixture.id, fixture.identifier)).toBe(failure);
   });
 
-  it.each([
-    ['comic-days', 'コミックDAYS 42', 'https://comic-days.com/series/42'],
-    ['firecross', 'ファイアCROSS 42', 'https://firecross.jp/ebook/series/42'],
-    ['gaugau', 'がうがうモンスター＋ 42', 'https://gaugau.futabanet.jp/list/work/42/episodes'],
-    ['hayacomic', 'ハヤコミ 42', 'https://hayacomic.jp/series/42'],
-    ['jump-rookie', 'ジャンプルーキー！ 42', 'https://rookie.shonenjump.com/series/42'],
-    ['mangabox', 'マンガボックス 42', 'https://www.mangabox.me/reader/42/episodes/all/'],
-    ['yanmaga', '42', 'https://yanmaga.jp/comics/42?sort=older'],
-  ])('%s retains useful defaults when page metadata is missing', async (id, title, link) => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn<typeof fetch>(async () => new Response('<html></html>')),
-    );
-    expect(await successfulFeed(id, '42')).toEqual({ title, link, description: '', items: [] });
-  });
+  it.each(['comic-days', 'firecross', 'gaugau', 'hayacomic', 'jump-rookie', 'mangabox', 'yanmaga'])(
+    '%s fails instead of returning an empty feed when no episodes are found',
+    async (id) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn<typeof fetch>(async () => new Response('<html></html>')),
+      );
+      await expect(failedFeed(id, '42')).resolves.toBeInstanceOf(Error);
+    },
+  );
 });

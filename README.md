@@ -46,6 +46,12 @@ The Pixiv Comic provider reads publicly exposed work and episode metadata only. 
 
 The コロナEX provider reads the publicly embedded `__NEXT_DATA__` payload of the comic page and emits a single item for the latest episode, because the site's full episode list is only available through its authenticated web API. A new item appears when the latest episode changes; if two episodes are published between two reader polls, the earlier one is not emitted. It links to the official episode page and does not fetch episode text, images, paid content, or login-required data. If the page payload, the comic metadata, or the latest episode cannot be parsed, the provider fails the feed request instead of returning an empty feed; the site may change its Next.js payload shape.
 
+The ファイアCROSS provider reads the series page in newest-first order (`?sort=latest`) and follows its pagination to the last page, because the default oldest-first first page alone would pin the feed to the earliest episodes forever. Episode entries no longer expose per-episode links, so each item is identified by the episode ID in the listing (`data-id`, also used as the RSS GUID) and links to the series page anchor `#ep<episode-id>`. If any page fails to load or lists no episodes, the provider fails the feed request instead of returning a partial feed.
+
+## Failure behavior
+
+A feed request never returns an empty feed with a 200 status. When the source site answers 404 (the work does not exist), the bridge answers 404 as well. Every other failure — network errors, other upstream statuses, unparsable pages, and pages whose episode list comes back empty (for example after a site redesign or a bot wall served with 200) — answers 502. The bridge never answers 410, because readers such as FreshRSS stop polling feeds that return it.
+
 ## Development
 
 ```bash

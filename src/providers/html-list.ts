@@ -1,3 +1,4 @@
+import { requireFeedItems } from '../lib/feed.ts';
 import { fetchText } from '../lib/http.ts';
 import {
   absoluteUrl,
@@ -85,5 +86,6 @@ export const createHtmlListProvider = (options: HtmlListProviderOptions): Provid
         description: extractMetaContent(html, 'description') ?? '',
         items,
       })),
+      Result.andThen((feed) => requireFeedItems(options.id, feed)),
     ),
   );

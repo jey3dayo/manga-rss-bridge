@@ -7,6 +7,7 @@ import {
   RESPONSE_TEXT,
   ROUTES,
 } from './constants/server.ts';
+import { HttpStatusError } from './lib/http.ts';
 import { Result } from './lib/result.ts';
 import { renderRss } from './lib/rss.ts';
 import type { Provider } from './types/feed.ts';
@@ -39,6 +40,12 @@ export const createApp = (providers: readonly Provider[]) => {
     const feed = await provider.fetchFeed(identifier);
     if (Result.isFailure(feed)) {
       console.error(LOG_EVENTS.feedError, { provider: providerId, identifier, error: feed.error });
+      // A work that does not exist upstream is a plain 404; every other
+      // failure is a bad gateway. 410 is never used: readers such as
+      // FreshRSS stop polling feeds that answer 410.
+      if (feed.error instanceof HttpStatusError && feed.error.status === 404) {
+        return c.text(RESPONSE_TEXT.notFound, 404);
+      }
       return c.text(RESPONSE_TEXT.feedFetchFailed, 502);
     }
 

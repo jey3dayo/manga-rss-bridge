@@ -60,7 +60,10 @@ describe('providers', () => {
     const fetchMock: typeof fetch = async (input) => {
       requestedUrl = String(input);
       return new Response(
-        '<head><meta property="og:title" content="『キミイロ×ライバー』 | ヤンマガWeb" /></head>',
+        `<head><meta property="og:title" content="『キミイロ×ライバー』 | ヤンマガWeb" /></head>
+         <li class="mod-episode-item" data-episode-title="第1話" data-original-url="/comics/abc/aaa">
+           <time class="mod-episode-date">2026/01/05</time>
+         </li>`,
       );
     };
     vi.stubGlobal('fetch', fetchMock);

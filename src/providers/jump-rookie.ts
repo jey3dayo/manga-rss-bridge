@@ -1,4 +1,5 @@
 import { PROVIDERS } from '../constants/providers.ts';
+import { requireFeedItems } from '../lib/feed.ts';
 import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchText } from '../lib/http.ts';
 import { absoluteUrl, extractMetaContent, stripTags, uniqueByUrl } from '../lib/html.ts';
@@ -58,5 +59,6 @@ export const jumpRookieProvider = createProvider(PROVIDERS.jumpRookie, async (se
       description: extractMetaContent(html, 'description') ?? '',
       items,
     })),
+    Result.andThen((feed) => requireFeedItems(PROVIDERS.jumpRookie.id, feed)),
   ),
 );

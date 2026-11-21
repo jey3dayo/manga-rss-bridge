@@ -3,6 +3,16 @@ import { HTTP_HEADERS, MIME_TYPES, USER_AGENT } from '../constants/http.ts';
 import { parseSchema } from '../schemas/parse.ts';
 import { Result, type ResultAsync, toError } from './result.ts';
 
+export class HttpStatusError extends Error {
+  readonly status: number;
+
+  constructor(url: string, status: number) {
+    super(`GET ${url} failed: ${status}`);
+    this.name = 'HttpStatusError';
+    this.status = status;
+  }
+}
+
 const mergeHeaders = (
   defaults: RequestInit['headers'],
   headers: RequestInit['headers'],
@@ -39,7 +49,7 @@ const fetchResponse = (
     Result.andThen((response) =>
       response.ok
         ? Result.succeed(response)
-        : Result.fail(new Error(`GET ${url} failed: ${response.status}`)),
+        : Result.fail(new HttpStatusError(url, response.status)),
     ),
   );
 

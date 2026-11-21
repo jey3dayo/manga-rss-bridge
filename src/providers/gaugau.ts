@@ -1,4 +1,5 @@
 import { PROVIDERS } from '../constants/providers.ts';
+import { requireFeedItems } from '../lib/feed.ts';
 import { titleBeforeSeparator } from '../lib/feed-title.ts';
 import { fetchText } from '../lib/http.ts';
 import {
@@ -60,5 +61,6 @@ export const gaugauProvider = createProvider(PROVIDERS.gaugau, async (workId) =>
       description: extractMetaContent(html, 'description') ?? '',
       items,
     })),
+    Result.andThen((feed) => requireFeedItems(PROVIDERS.gaugau.id, feed)),
   ),
 );

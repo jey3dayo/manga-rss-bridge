@@ -9,7 +9,6 @@ import { Result } from '../lib/result.ts';
 import { mangaOneProvider } from './manga-one.ts';
 
 beforeEach(() => {
-  // Every test is offline: unexpected requests can never reach the network.
   vi.stubGlobal(
     'fetch',
     vi.fn<typeof fetch>(async () => {

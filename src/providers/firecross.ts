@@ -22,9 +22,6 @@ const browserHeaders = {
 
 const init: RequestInit = { headers: browserHeaders };
 
-// The series page lists 20 episodes per page, oldest first by default. The
-// `sort=latest` view lists them newest first, so page 1 always carries the
-// newest episodes even before older pages are merged in.
 const MAX_PAGES = 50;
 
 const pageUrl = (seriesId: string, page: number): string =>
@@ -77,8 +74,6 @@ export const firecrossProvider = createProvider(PROVIDERS.firecross, async (seri
   if (Result.isFailure(pages)) return pages;
   const [firstPage = ''] = pages.value;
   const episodesByPage = pages.value.map((html) => parseEpisodes(html, seriesUrl));
-  // An entirely empty page means the listing structure changed (or a bot
-  // wall was served with 200), so fail instead of returning a partial feed.
   const emptyPage = episodesByPage.findIndex((episodes) => episodes.length === 0);
   if (emptyPage >= 0) {
     return Result.fail(

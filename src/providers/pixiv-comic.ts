@@ -17,6 +17,22 @@ type PixivMetadata = {
   episodesResponse: PixivComicEpisodesResponse;
 };
 
+type PixivMetadataRequests = {
+  workResponse: ResultAsync<PixivComicWorkResponse, Error>;
+  episodesResponse: ResultAsync<PixivComicEpisodesResponse, Error>;
+};
+
+const firstFailureOrAll = (requests: PixivMetadataRequests): ResultAsync<PixivMetadata, Error> =>
+  new Promise((resolve) => {
+    const fail = (error: unknown) => resolve(Result.fail(toError(error)));
+    for (const request of Object.values(requests)) {
+      request.then((result) => {
+        if (Result.isFailure(result)) resolve(result);
+      }, fail);
+    }
+    Result.sequence(requests).then(resolve, fail);
+  });
+
 const fetchMetadata = (workId: string): ResultAsync<PixivMetadata, Error> => {
   const workUrl = `${PROVIDERS.pixivComic.baseUrl}/api/app/works/v5/${workId}`;
   const episodesUrl = `${PROVIDERS.pixivComic.baseUrl}/api/app/works/${workId}/episodes/v2`;
@@ -26,19 +42,9 @@ const fetchMetadata = (workId: string): ResultAsync<PixivMetadata, Error> => {
     [HTTP_HEADERS.referer]: `${PROVIDERS.pixivComic.baseUrl}/works/${workId}`,
     [HTTP_HEADERS.xRequestedWith]: 'XMLHttpRequest',
   };
-  const requests = {
+  return firstFailureOrAll({
     workResponse: fetchJson(workUrl, pixivComicWorkResponseSchema, { headers }),
     episodesResponse: fetchJson(episodesUrl, pixivComicEpisodesResponseSchema, { headers }),
-  };
-  return new Promise((resolve) => {
-    const fail = (error: unknown) => resolve(Result.fail(toError(error)));
-    // sequence awaits in key order; either concurrent request must still fail fast.
-    for (const request of Object.values(requests)) {
-      request.then((result) => {
-        if (Result.isFailure(result)) resolve(result);
-      }, fail);
-    }
-    Result.sequence(requests).then(resolve, fail);
   });
 };
 

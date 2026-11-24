@@ -1,6 +1,11 @@
 import type { z } from 'zod';
 import { Result, toError } from '../lib/result.ts';
 
+const succeedVerbatim = <Value>(value: Value): Result<Value, Error> => ({
+  type: 'Success',
+  value,
+});
+
 export const parseSchema = <Schema extends z.ZodType>(
   schema: Schema,
   input: unknown,
@@ -9,7 +14,6 @@ export const parseSchema = <Schema extends z.ZodType>(
     Result.try({ try: () => schema.safeParse(input), catch: toError }),
     Result.andThen((parsed): Result<z.output<Schema>, Error> => {
       if (!parsed.success) return Result.fail(parsed.error);
-      // Preserve the schema output verbatim; Result.succeed unwraps promise values.
-      return { type: 'Success', value: parsed.data };
+      return succeedVerbatim(parsed.data);
     }),
   );

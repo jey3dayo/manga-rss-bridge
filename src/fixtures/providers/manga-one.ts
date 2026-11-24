@@ -1,3 +1,7 @@
+import {
+  MANGA_ONE_CHAPTER_FIELDS,
+  MANGA_ONE_CHAPTER_LIST_FIELDS,
+} from '../../constants/manga-one.ts';
 import type { ProviderFixture } from './types.ts';
 
 const varint = (value: number): number[] => {
@@ -24,19 +28,26 @@ type ChapterFixture = {
   date?: string;
 };
 
-// Public chapter-list metadata only. Field numbers follow the provider's wire format.
 export const mangaOneChapterList = (chapters: ChapterFixture[], totalCount = 0): Uint8Array =>
   new Uint8Array(
-    lengthDelimited(1, [
+    lengthDelimited(MANGA_ONE_CHAPTER_LIST_FIELDS.payload, [
       ...chapters.flatMap((chapter) =>
-        lengthDelimited(1, [
-          ...(chapter.id === undefined ? [] : [8, ...varint(chapter.id)]),
-          ...(chapter.title === undefined ? [] : lengthDelimited(2, chapter.title)),
-          ...(chapter.thumbnail === undefined ? [] : lengthDelimited(4, chapter.thumbnail)),
-          ...(chapter.date === undefined ? [] : lengthDelimited(5, chapter.date)),
+        lengthDelimited(MANGA_ONE_CHAPTER_LIST_FIELDS.chapter, [
+          ...(chapter.id === undefined
+            ? []
+            : [...varint(MANGA_ONE_CHAPTER_FIELDS.id * 8), ...varint(chapter.id)]),
+          ...(chapter.title === undefined
+            ? []
+            : lengthDelimited(MANGA_ONE_CHAPTER_FIELDS.title, chapter.title)),
+          ...(chapter.thumbnail === undefined
+            ? []
+            : lengthDelimited(MANGA_ONE_CHAPTER_FIELDS.thumbnail, chapter.thumbnail)),
+          ...(chapter.date === undefined
+            ? []
+            : lengthDelimited(MANGA_ONE_CHAPTER_FIELDS.date, chapter.date)),
         ]),
       ),
-      40,
+      ...varint(MANGA_ONE_CHAPTER_LIST_FIELDS.totalCount * 8),
       ...varint(totalCount),
     ]),
   );

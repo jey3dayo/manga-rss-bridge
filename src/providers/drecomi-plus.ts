@@ -107,25 +107,36 @@ const isSeriesDetailHash = (hash: string): boolean =>
   !hash.includes('volumes') &&
   !hash.includes('pickup');
 
-const findSeriesState = (html: string, seriesCode: string): Result<DrecomiSeriesState, Error> => {
+const findSeriesDetail = (candidates: DehydratedQuery[]): DrecomiPlusSeriesDetail | undefined => {
   let detail: DrecomiPlusSeriesDetail | undefined;
+  for (const { hash, data } of candidates) {
+    if (!isSeriesDetailHash(hash)) continue;
+    const parsed = parseSchema(drecomiPlusSeriesDetailSchema, data);
+    if (Result.isSuccess(parsed)) detail = parsed.value;
+  }
+  return detail;
+};
+
+const collectEpisodes = (candidates: DehydratedQuery[]): Map<string, DrecomiPlusEpisode> => {
   const episodes = new Map<string, DrecomiPlusEpisode>();
-  for (const { hash, data } of queryCandidates(dehydratedStates(decodeFlightEntries(html)))) {
-    if (!hash.includes(seriesCode)) continue;
-    if (isSeriesDetailHash(hash)) {
-      const parsed = parseSchema(drecomiPlusSeriesDetailSchema, data);
-      if (Result.isSuccess(parsed)) detail = parsed.value;
-    }
-    if (hash.includes('episodes')) {
-      const parsed = parseSchema(drecomiPlusEpisodesDataSchema, data);
-      if (Result.isSuccess(parsed)) {
-        for (const item of parsed.value.items ?? []) {
-          const code = episodeCode(item);
-          if (code) episodes.set(code, item);
-        }
-      }
+  for (const { hash, data } of candidates) {
+    if (!hash.includes('episodes')) continue;
+    const parsed = parseSchema(drecomiPlusEpisodesDataSchema, data);
+    if (!Result.isSuccess(parsed)) continue;
+    for (const item of parsed.value.items ?? []) {
+      const code = episodeCode(item);
+      if (code) episodes.set(code, item);
     }
   }
+  return episodes;
+};
+
+const findSeriesState = (html: string, seriesCode: string): Result<DrecomiSeriesState, Error> => {
+  const candidates = queryCandidates(dehydratedStates(decodeFlightEntries(html))).filter(
+    ({ hash }) => hash.includes(seriesCode),
+  );
+  const detail = findSeriesDetail(candidates);
+  const episodes = collectEpisodes(candidates);
   return episodes.size > 0
     ? Result.succeed({ detail, episodes: [...episodes.values()] })
     : Result.fail(new Error(`drecomi-plus episode list not found for ${seriesCode}`));

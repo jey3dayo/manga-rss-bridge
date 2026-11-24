@@ -7,5 +7,3 @@ export const mangaOnePageMetadataSchema = z.object({
   image: z.string().optional(),
   titleId: z.number().optional(),
 });
-
-export type MangaOnePageMetadata = z.infer<typeof mangaOnePageMetadataSchema>;

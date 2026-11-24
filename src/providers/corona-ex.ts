@@ -6,14 +6,10 @@ import {
 } from '../constants/http.ts';
 import { PROVIDERS } from '../constants/providers.ts';
 import { fetchText } from '../lib/http.ts';
-import { Result, toError } from '../lib/result.ts';
-import { parseSchema } from '../schemas/parse.ts';
+import { Result } from '../lib/result.ts';
+import { parseNextData } from '../schemas/parse.ts';
 import type { MangaFeed } from '../types/feed.ts';
-import {
-  coronaExNextDataSchema,
-  type CoronaExComic,
-  type CoronaExNextData,
-} from '../schemas/corona-ex.ts';
+import { coronaExNextDataSchema, type CoronaExComic } from '../schemas/corona-ex.ts';
 import { createProvider } from './create-provider.ts';
 
 const browserHeaders = {
@@ -24,16 +20,6 @@ const browserHeaders = {
 };
 
 const comicIdPattern = /^[1-9]\d*$/;
-
-const extractNextData = (html: string): Result<CoronaExNextData, Error> => {
-  const match = /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s.exec(html);
-  if (!match?.[1]) return Result.fail(new Error('corona-ex __NEXT_DATA__ not found'));
-  const json = match[1];
-  return Result.pipe(
-    Result.try({ try: (): unknown => JSON.parse(json), catch: toError }),
-    Result.andThen((data) => parseSchema(coronaExNextDataSchema, data)),
-  );
-};
 
 const toFeed = (comic: CoronaExComic, comicId: string, link: string): Result<MangaFeed, Error> => {
   if (String(comic.id) !== comicId) {
@@ -71,7 +57,7 @@ export const coronaExProvider = createProvider(PROVIDERS.coronaEx, async (identi
   const link = `${PROVIDERS.coronaEx.baseUrl}/comics/${encodeURIComponent(comicId)}`;
   return Result.pipe(
     fetchText(link, { headers: browserHeaders }),
-    Result.andThen(extractNextData),
+    Result.andThen((html) => parseNextData(coronaExNextDataSchema, html, 'corona-ex')),
     Result.andThen((nextData) =>
       toFeed(nextData.props.pageProps.fallbackData.comic, comicId, link),
     ),

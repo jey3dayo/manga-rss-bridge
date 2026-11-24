@@ -5,7 +5,7 @@ const chapterSchema = z.object({
   mainText: z.string().optional(),
 });
 
-export const ganganTitleSchema = z.object({
+const ganganTitleSchema = z.object({
   titleName: z.string().optional(),
   author: z.string().optional(),
   description: z.string().optional(),
@@ -32,5 +32,3 @@ export const ganganTitleDataSchema = z.object({
 export const ganganEmbeddedTitleSchema = z.object({
   props: ganganTitleDataSchema,
 });
-
-export type GanganNextData = z.infer<typeof ganganNextDataSchema>;

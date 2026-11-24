@@ -17,3 +17,19 @@ export const parseSchema = <Schema extends z.ZodType>(
       return succeedVerbatim(parsed.data);
     }),
   );
+
+const nextDataPattern = /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s;
+
+export const parseNextData = <Schema extends z.ZodType>(
+  schema: Schema,
+  html: string,
+  source: string,
+): Result<z.output<Schema>, Error> => {
+  const match = nextDataPattern.exec(html);
+  if (!match?.[1]) return Result.fail(new Error(`${source} __NEXT_DATA__ not found`));
+  const json = match[1];
+  return Result.pipe(
+    Result.try({ try: (): unknown => JSON.parse(json), catch: toError }),
+    Result.andThen((data) => parseSchema(schema, data)),
+  );
+};

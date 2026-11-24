@@ -5,12 +5,12 @@ const pageUrl = 'https://drecomi-plus.jp/series/CD00035';
 export const flightEntryPayload = (id: string, value: unknown): string =>
   `${id}:${JSON.stringify(value)}`;
 
-export const flightScripts = (payloads: string[]): string =>
+const flightScripts = (payloads: string[]): string =>
   payloads
     .map((payload) => `<script>self.__next_f.push([1,${JSON.stringify(payload)}])</script>`)
     .join('');
 
-export const splitFlightEntry = (payload: string): [string, string] => {
+const splitFlightEntry = (payload: string): [string, string] => {
   const half = Math.floor(payload.length / 2);
   const split = /^\d+:/.test(payload.slice(half)) ? payload.indexOf(':') + 1 : half;
   return [payload.slice(0, split), payload.slice(split)];

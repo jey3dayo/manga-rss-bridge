@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { z } from 'zod';
 import { Result } from '../lib/result.ts';
-import { parseSchema } from './parse.ts';
+import { parseNextData, parseSchema } from './parse.ts';
 
 describe('parseSchema', () => {
   afterEach(() => {
@@ -55,5 +55,23 @@ describe('parseSchema', () => {
     });
 
     expect(parseSchema(schema, 'input')).toEqual(Result.fail(new Error('invalid transformation')));
+  });
+});
+
+describe('parseNextData', () => {
+  const schema = z.object({ buildId: z.string() });
+  const html = (data: unknown) =>
+    `<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(data)}</script>`;
+
+  it('parses the embedded JSON with the given schema', () => {
+    expect(parseNextData(schema, html({ buildId: 'b1' }), 'example')).toEqual(
+      Result.succeed({ buildId: 'b1' }),
+    );
+  });
+
+  it('fails with the source name when the script tag is absent', () => {
+    expect(parseNextData(schema, '<html></html>', 'example')).toEqual(
+      Result.fail(new Error('example __NEXT_DATA__ not found')),
+    );
   });
 });

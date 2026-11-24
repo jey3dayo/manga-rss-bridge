@@ -6,7 +6,7 @@ const episodeThumbnailSchema = z
   })
   .passthrough();
 
-export const drecomiPlusEpisodeSchema = z
+const drecomiPlusEpisodeSchema = z
   .object({
     code: z.union([z.string(), z.number()]).nullable().optional(),
     name: z.string().optional(),
@@ -32,7 +32,7 @@ export const drecomiPlusEpisodesDataSchema = z
   })
   .passthrough();
 
-export const drecomiPlusDehydratedQuerySchema = z
+const drecomiPlusDehydratedQuerySchema = z
   .object({
     queryHash: z.union([z.string(), z.array(z.unknown())]).optional(),
     queryKey: z.array(z.unknown()).optional(),

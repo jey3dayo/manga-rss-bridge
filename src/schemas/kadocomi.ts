@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const kadocomiEpisodeSchema = z.object({
+const kadocomiEpisodeSchema = z.object({
   code: z.string().optional(),
   title: z.string().optional(),
   subTitle: z.string().optional(),

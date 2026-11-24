@@ -6,27 +6,16 @@ import {
   ganganEmbeddedTitleSchema,
   ganganNextDataSchema,
   ganganTitleDataSchema,
-  type GanganNextData,
   type GanganTitle,
 } from '../schemas/gangan-online.ts';
-import { parseSchema } from '../schemas/parse.ts';
+import { parseNextData, parseSchema } from '../schemas/parse.ts';
 import type { FeedItem } from '../types/feed.ts';
 import { createProvider } from './create-provider.ts';
-
-const extractNextData = (html: string): Result<GanganNextData, Error> => {
-  const match = /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s.exec(html);
-  if (!match?.[1]) return Result.fail(new Error('__NEXT_DATA__ not found'));
-  const json = match[1];
-  return Result.pipe(
-    Result.try({ try: (): unknown => JSON.parse(json), catch: toError }),
-    Result.andThen((data) => parseSchema(ganganNextDataSchema, data)),
-  );
-};
 
 const fetchTitle = (pageUrl: string, encodedTitleId: string): ResultAsync<GanganTitle, Error> =>
   Result.pipe(
     fetchText(pageUrl),
-    Result.andThen(extractNextData),
+    Result.andThen((html) => parseNextData(ganganNextDataSchema, html, 'gangan-online')),
     Result.andThen(async (nextData) => {
       if (nextData.buildId) {
         const dataUrl = `${PROVIDERS.ganganOnline.baseUrl}/_next/data/${nextData.buildId}/title/${encodedTitleId}.json`;

@@ -21,5 +21,5 @@ export const coronaExNextDataSchema = z.object({
   }),
 });
 
-export type CoronaExNextData = z.infer<typeof coronaExNextDataSchema>;
+type CoronaExNextData = z.infer<typeof coronaExNextDataSchema>;
 export type CoronaExComic = CoronaExNextData['props']['pageProps']['fallbackData']['comic'];

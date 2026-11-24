@@ -5,7 +5,6 @@ import { Result } from '../lib/result.ts';
 import { ganganOnlineProvider } from './gangan-online.ts';
 
 beforeEach(() => {
-  // Every test is offline: unexpected requests can never reach the network.
   vi.stubGlobal(
     'fetch',
     vi.fn<typeof fetch>(async () => {

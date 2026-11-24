@@ -14,7 +14,6 @@ import {
 import { failedFeed, mockResponses, successfulFeed } from '../fixtures/providers/test-helpers.ts';
 
 beforeEach(() => {
-  // Every test is offline: unexpected requests can never reach the network.
   vi.stubGlobal(
     'fetch',
     vi.fn<typeof fetch>(async () => {

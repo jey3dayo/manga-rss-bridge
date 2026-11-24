@@ -1,4 +1,5 @@
 import { BROWSER_USER_AGENT, HTTP_HEADERS, MIME_TYPES } from '../constants/http.ts';
+import { MANGA_ONE_CHAPTER_FIELDS, MANGA_ONE_CHAPTER_LIST_FIELDS } from '../constants/manga-one.ts';
 import { PROVIDERS } from '../constants/providers.ts';
 import { fallbackFeedTitle } from '../lib/feed-title.ts';
 import { fetchBytes, fetchText } from '../lib/http.ts';
@@ -90,13 +91,17 @@ const decodeText = (value: number | Uint8Array): string =>
 const parseChapter = (data: Uint8Array): MangaOneChapter | undefined => {
   const chapter: Partial<MangaOneChapter> = {};
   for (const field of readFields(data)) {
-    if (field.field === 1 && field.wireType === 0 && typeof field.value === 'number') {
+    if (
+      field.field === MANGA_ONE_CHAPTER_FIELDS.id &&
+      field.wireType === 0 &&
+      typeof field.value === 'number'
+    ) {
       chapter.id = String(field.value);
-    } else if (field.field === 2 && field.wireType === 2) {
+    } else if (field.field === MANGA_ONE_CHAPTER_FIELDS.title && field.wireType === 2) {
       chapter.title = decodeText(field.value);
-    } else if (field.field === 4 && field.wireType === 2) {
+    } else if (field.field === MANGA_ONE_CHAPTER_FIELDS.thumbnail && field.wireType === 2) {
       chapter.thumbnail = decodeText(field.value);
-    } else if (field.field === 5 && field.wireType === 2) {
+    } else if (field.field === MANGA_ONE_CHAPTER_FIELDS.date && field.wireType === 2) {
       chapter.date = decodeText(field.value);
     }
   }
@@ -110,13 +115,25 @@ const parseChapterList = Result.fn({
     const chapters: MangaOneChapter[] = [];
     let totalCount = 0;
     for (const field of readFields(data)) {
-      if (field.field !== 1 || field.wireType !== 2 || !(field.value instanceof Uint8Array))
+      if (
+        field.field !== MANGA_ONE_CHAPTER_LIST_FIELDS.payload ||
+        field.wireType !== 2 ||
+        !(field.value instanceof Uint8Array)
+      )
         continue;
       for (const child of readFields(field.value)) {
-        if (child.field === 1 && child.wireType === 2 && child.value instanceof Uint8Array) {
+        if (
+          child.field === MANGA_ONE_CHAPTER_LIST_FIELDS.chapter &&
+          child.wireType === 2 &&
+          child.value instanceof Uint8Array
+        ) {
           const chapter = parseChapter(child.value);
           if (chapter) chapters.push(chapter);
-        } else if (child.field === 5 && child.wireType === 0 && typeof child.value === 'number') {
+        } else if (
+          child.field === MANGA_ONE_CHAPTER_LIST_FIELDS.totalCount &&
+          child.wireType === 0 &&
+          typeof child.value === 'number'
+        ) {
           totalCount = child.value;
         }
       }

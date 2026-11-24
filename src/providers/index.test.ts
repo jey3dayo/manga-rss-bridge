@@ -6,7 +6,6 @@ import { failedFeed, mockResponses, successfulFeed } from '../fixtures/providers
 import { listProviders } from './index.ts';
 
 beforeEach(() => {
-  // Every test is offline, including Pixiv: unexpected requests can never reach the network.
   vi.stubGlobal(
     'fetch',
     vi.fn<typeof fetch>(async () => {

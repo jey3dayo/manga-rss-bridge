@@ -20,7 +20,6 @@ describe('firecross pagination branches', () => {
   const page1 = firecrossFixture.responses[page1Url] as string;
 
   it('fails when a later page cannot be fetched', async () => {
-    // Page 2 is absent from the fixture map, so its request rejects.
     mockResponses({ [page1Url]: page1 });
     await expect(failedFeed('firecross', '42')).resolves.toBeInstanceOf(Error);
   });

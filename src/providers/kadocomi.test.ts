@@ -4,7 +4,6 @@ import { Result } from '../lib/result.ts';
 import { kadocomiProvider } from './kadocomi.ts';
 
 beforeEach(() => {
-  // Every test is offline: unexpected requests can never reach the network.
   vi.stubGlobal(
     'fetch',
     vi.fn<typeof fetch>(async () => {

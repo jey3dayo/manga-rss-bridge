@@ -30,6 +30,14 @@ describe('feed title helpers', () => {
     );
   });
 
+  it('normalizes site-wrapped titles when the site name contains regex characters', () => {
+    expect(normalizeSiteWrappedTitle('A.B+C（Work）', 'A.B+C', 'series')).toBe('Work');
+  });
+
+  it('trims whitespace inside a site-wrapped title', () => {
+    expect(normalizeSiteWrappedTitle('Site（ Work ）', 'Site', 'work')).toBe('Work');
+  });
+
   it('takes a title before common title separators', () => {
     const html = '<meta property="og:title" content="Work｜Site" />';
     expect(titleBeforeSeparator(html, 'Site', 'work')).toBe('Work');

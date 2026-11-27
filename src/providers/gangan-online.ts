@@ -31,10 +31,14 @@ const fetchTitle = (pageUrl: string, encodedTitleId: string): ResultAsync<Gangan
     }),
   );
 
+const isNextUpdateNotice = (mainText: string | undefined): boolean =>
+  mainText?.startsWith('次回更新') ?? false;
+
 const parseItems = Result.fn({
   try: (title: GanganTitle, link: string): FeedItem[] =>
     (title.chapters ?? [])
       .filter((chapter) => chapter.id !== undefined)
+      .filter((chapter) => !isNextUpdateNotice(chapter.mainText))
       .flatMap((chapter) => {
         const chapterId = String(chapter.id).trim();
         if (!chapterId) return [];

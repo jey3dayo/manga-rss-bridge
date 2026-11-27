@@ -7,6 +7,9 @@ export const gaugauFixture: ProviderFixture = {
     'https://gaugau.futabanet.jp/list/work/work%2F42/episodes': `
         <meta property="og:title" content="星の旅｜がうがうモンスター＋" />
         <meta content="夜空&amp;冒険" name="description" />
+        <div class="episode__grid"><a href="https://gaugau.futabanet.jp/list/app">
+          <div class="episode__num">第3話</div>
+          <div class="episode__title">旅立ち</div></a></div>
         <div class="episode__grid"><div class="episode__num">第2話</div>
           <div class="episode__title"><b>旅立ち</b></div><time>2026年09月03日</time>
           <img src="/covers/202.jpg" /></div>

@@ -23,6 +23,7 @@ curl http://localhost:8080/gangan-online/2061.xml
 http://localhost:8080/gangan-online/2061.xml
 http://localhost:8080/kadocomi/KC_000733_S.xml
 http://localhost:8080/comic-days/10834108156754578626.xml
+http://localhost:8080/drecomi-plus/CD00035.xml
 http://localhost:8080/yanmaga/%E3%81%AD%E3%81%9A%E3%81%BF%E3%81%AE%E5%88%9D%E6%81%8B.xml
 http://localhost:8080/manga-one/157056.xml
 http://localhost:8080/gaugau/5f500f137765618260000000.xml

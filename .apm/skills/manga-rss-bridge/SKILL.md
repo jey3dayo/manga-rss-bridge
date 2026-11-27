@@ -52,6 +52,7 @@ Supported route patterns:
 /gangan-online/<title-id>.xml
 /kadocomi/<work-code>.xml
 /comic-days/<series-id>.xml
+/drecomi-plus/<series-code>.xml
 /yanmaga/<comic-slug>.xml
 /manga-one/<chapter-id>.xml
 /gaugau/<work-id>.xml

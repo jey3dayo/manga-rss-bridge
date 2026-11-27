@@ -7,7 +7,12 @@ export const ganganTitle = {
   titleName: '星の旅',
   author: '星野',
   description: '旅の記録',
-  chapters: [{ id: 12, mainText: '第12話' }, { id: 'chapter/a' }, { mainText: '未公開' }],
+  chapters: [
+    { id: 13, mainText: '次回更新：12月1日' },
+    { id: 12, mainText: '第12話' },
+    { id: 'chapter/a' },
+    { mainText: '未公開' },
+  ],
 };
 
 export const ganganOnlineFixture: ProviderFixture = {

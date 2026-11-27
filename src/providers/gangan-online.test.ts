@@ -102,4 +102,30 @@ describe('providers', () => {
     expect(result.value.items).toHaveLength(1);
     expect(result.value.items[0]?.id).toBe('123');
   });
+
+  it('skips the next-update notice entry, whose chapter page does not exist yet', async () => {
+    const nextData = {
+      props: {
+        pageProps: {
+          data: {
+            default: {
+              titleName: 'Gangan',
+              chapters: [
+                { id: 131999, mainText: '次回更新：1月2日' },
+                { id: 123096, mainText: '第十八話-3' },
+              ],
+            },
+          },
+        },
+      },
+    };
+    const html = `<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`;
+    const fetchMock: typeof fetch = async () => new Response(html);
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await ganganOnlineProvider.fetchFeed('1552');
+    if (Result.isFailure(result)) throw result.error;
+
+    expect(result.value.items.map((item) => item.id)).toEqual(['123096']);
+  });
 });
